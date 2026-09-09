@@ -1,4 +1,4 @@
-// js/app.js
+// app.js
 
 import { saveGitHubConfig, getGitHubConfig, listRepositoryFiles } from './githubService.js';
 
@@ -9,16 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveBtn = document.getElementById('btn-save');
   const statusMsg = document.getElementById('status-message');
 
-  // Load existing configuration from localStorage if available
   const currentConfig = getGitHubConfig();
   if (currentConfig) {
-    ownerInput.value = currentConfig.owner;
-    repoInput.value = currentConfig.repo;
-    tokenInput.value = currentConfig.token;
+    ownerInput.value = currentConfig.owner || '';
+    repoInput.value = currentConfig.repo || '';
+    tokenInput.value = currentConfig.token || '';
   }
 
   saveBtn.addEventListener('click', async () => {
-    // Fill in values from inputs
     const githubOwner = ownerInput.value.trim();
     const githubRepo = repoInput.value.trim();
     const githubToken = tokenInput.value.trim();
@@ -34,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     statusMsg.style.color = '#D4AF37';
 
     try {
-      // Test API access by attempting to list Blueprints
       await listRepositoryFiles('Blueprints');
       statusMsg.textContent = 'Connection successful! Ready for Phase 2.';
       statusMsg.style.color = '#51CF66';
