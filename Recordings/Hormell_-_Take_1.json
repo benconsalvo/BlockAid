@@ -1,0 +1,1797 @@
+{
+  "id": "rec_1788925484561",
+  "name": "Hormell - Take 1",
+  "updatedAt": "2026-09-09T03:46:13.601Z",
+  "floors": [
+    {
+      "level": 1,
+      "name": "Second Floor",
+      "layerData": "{\"attrs\":{},\"className\":\"Layer\",\"children\":[{\"attrs\":{\"x\":388,\"y\":321,\"width\":258,\"height\":223,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Rect\"},{\"attrs\":{\"x\":1505,\"y\":599,\"width\":-311,\"height\":-546,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Rect\"},{\"attrs\":{\"x\":860,\"y\":116,\"radius\":152.7121475194426,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Circle\"}]}"
+    },
+    {
+      "level": 2,
+      "name": "Stage",
+      "layerData": "{\"attrs\":{},\"className\":\"Layer\",\"children\":[{\"attrs\":{\"x\":388,\"y\":321,\"width\":258,\"height\":223,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Rect\"},{\"attrs\":{\"x\":1505,\"y\":599,\"width\":-311,\"height\":-546,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Rect\"},{\"attrs\":{\"x\":860,\"y\":116,\"radius\":152.7121475194426,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Circle\"}]}"
+    }
+  ],
+  "recordedFrames": [
+    {
+      "timestamp": 100,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 915,
+          "y": 486.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 204,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 915,
+          "y": 486.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 310,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 915,
+          "y": 486.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 413,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 915,
+          "y": 486.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 517,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 915,
+          "y": 486.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 624,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 915,
+          "y": 486.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 729,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 915,
+          "y": 486.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 830,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 915,
+          "y": 486.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 931,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 915,
+          "y": 486.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 1032,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 915,
+          "y": 486.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 1138,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 913,
+          "y": 465.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 1242,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 900,
+          "y": 384.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 1343,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 885,
+          "y": 304.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 1444,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 875,
+          "y": 211.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 1548,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 871,
+          "y": 141.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 1648,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 1748,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 1848,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 1949,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 2050,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 2150,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 2251,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 2351,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 2452,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 2552,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 2652,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 2752,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 2853,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 2953,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 3053,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 3153,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 3253,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 3355,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 3456,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 3557,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 3656,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 3757,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 3858,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 3959,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 868,
+          "y": 115.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 4058,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 923,
+          "y": 133.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 4163,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 994,
+          "y": 149.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 4263,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1047,
+          "y": 155.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 4372,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1147,
+          "y": 178.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 4472,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1231,
+          "y": 196.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 4574,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1341,
+          "y": 222.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 4673,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1382,
+          "y": 233.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 4779,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 4879,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 4980,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 5080,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 5181,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 5281,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 5382,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 5482,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 5583,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 5683,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 5783,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 5885,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 247.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 5984,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1426,
+          "y": 262.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 6086,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1424,
+          "y": 299.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 6194,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1420,
+          "y": 334.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 6298,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1418,
+          "y": 379.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 6398,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1414,
+          "y": 409.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 6499,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1405,
+          "y": 442.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 6599,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1393,
+          "y": 455.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 6708,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1340,
+          "y": 471.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 6809,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1309,
+          "y": 477.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 6909,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1273,
+          "y": 482.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 7015,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1219,
+          "y": 483.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 7115,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1174,
+          "y": 484.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 7230,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1127,
+          "y": 478.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 7334,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1058,
+          "y": 470.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 7434,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 1012,
+          "y": 466.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 7535,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 953,
+          "y": 461.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 7639,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 893,
+          "y": 458.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 7740,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 855,
+          "y": 458.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 7849,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 768,
+          "y": 458.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 7953,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 722,
+          "y": 458.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 8058,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 665,
+          "y": 458.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 8162,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 610,
+          "y": 458.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 8262,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 574,
+          "y": 457.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 8372,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 560,
+          "y": 455.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 8471,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 548,
+          "y": 453.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 8572,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 538,
+          "y": 451.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 8672,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 534,
+          "y": 447.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 8773,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 525,
+          "y": 438.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 8873,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 523,
+          "y": 425.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 8974,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 9074,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 9175,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 9277,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 9382,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 9482,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 9583,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 9684,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 9784,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 9884,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 9984,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 10085,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 10185,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 10286,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 10386,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 10487,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 10587,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 10688,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 10788,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 10889,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 10989,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 11090,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 11194,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 11299,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 11402,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 11505,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 11614,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 11719,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 11820,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 11923,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 12022,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 12130,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 12234,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 12341,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 12442,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 12541,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 12642,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 12743,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 12844,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 12945,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 13046,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 13147,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 13247,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 522,
+          "y": 423.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 13349,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 518,
+          "y": 386.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 13450,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 509,
+          "y": 329.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 13551,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 507,
+          "y": 293.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 13655,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 507,
+          "y": 260.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 13755,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 508,
+          "y": 221.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 13855,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 172.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 13956,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 156.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 14064,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 139.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 14167,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 14270,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 14370,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 14474,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 14574,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 14675,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 14780,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 14880,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 14981,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 15082,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 15182,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 15283,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 15384,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 15484,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 15584,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 15684,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 15785,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 15885,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 15987,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 16089,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 16197,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 16304,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 16407,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 16508,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 16608,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 16709,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 16809,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 16913,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 17022,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 17126,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 17234,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 17334,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 17436,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 17537,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 17638,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 17738,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 17838,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 17938,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    },
+    {
+      "timestamp": 18039,
+      "performerData": {
+        "perf_1788925509359_12": {
+          "x": 511,
+          "y": 137.5,
+          "floor": 1
+        }
+      }
+    }
+  ],
+  "notes": [],
+  "performers": [
+    {
+      "id": "perf_1788925509359_12",
+      "name": "Actor 1",
+      "color": "#51CF66"
+    }
+  ]
+}
