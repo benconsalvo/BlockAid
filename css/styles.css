@@ -11,17 +11,20 @@
   --color-success: #51CF66;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
-  padding: 20px;
+  padding: 0;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  box-sizing: border-box;
 }
 
 /* MAIN MENU STYLES */
@@ -29,11 +32,11 @@ body {
   background-color: var(--color-card);
   border: 2px solid var(--color-gold);
   border-radius: 12px;
-  width: 100%;
+  width: 90%;
   max-width: 800px;
   padding: 32px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  margin: 20px auto;
 }
 
 .menu-header {
@@ -126,6 +129,10 @@ body {
   cursor: pointer;
 }
 
+.btn-primary:hover {
+  background-color: #9E1519;
+}
+
 .btn-secondary {
   background-color: #4A4A4A;
   color: white;
@@ -133,6 +140,10 @@ body {
   padding: 8px 14px;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #606060;
 }
 
 .btn-danger {
@@ -170,7 +181,7 @@ body {
   padding: 32px;
   border-radius: 8px;
   border: 1px solid var(--color-gold);
-  width: 100%;
+  width: 90%;
   max-width: 400px;
 }
 
@@ -183,7 +194,6 @@ body {
 .modal-content input {
   width: 100%;
   padding: 10px;
-  box-sizing: border-box;
   border-radius: 4px;
   border: 1px solid #555;
   background: var(--color-bg);
@@ -203,7 +213,6 @@ body {
   z-index: 500;
 }
 
-/* TOP CONTROL RIBBON */
 .top-ribbon {
   height: 60px;
   background-color: var(--color-card);
@@ -212,7 +221,6 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  box-sizing: border-box;
 }
 
 .ribbon-group-left, .ribbon-group-center {
@@ -244,7 +252,6 @@ body {
   font-size: 14px;
 }
 
-/* MIDDLE WORKING AREA */
 .canvas-workspace {
   flex: 1;
   display: flex;
@@ -252,7 +259,6 @@ body {
   overflow: hidden;
 }
 
-/* LEFT FLOOR RIBBON */
 .left-floor-ribbon {
   width: 120px;
   background-color: var(--color-card);
@@ -261,7 +267,6 @@ body {
   flex-direction: column;
   padding: 12px 8px;
   gap: 12px;
-  box-sizing: border-box;
 }
 
 .floor-title {
@@ -298,14 +303,14 @@ body {
   font-weight: bold;
 }
 
-/* CANVAS DISPLAY AREA */
 .konva-holder {
   flex: 1;
   background-color: #ECECEC;
   cursor: crosshair;
+  width: 100%;
+  height: 100%;
 }
 
-/* BOTTOM AUDIENCE INDICATOR */
 .bottom-direction-bar {
   height: 36px;
   background-color: var(--color-card);
