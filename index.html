@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BlockAid - Main Menu</title>
+  <title>BlockAid</title>
   <link rel="stylesheet" href="css/styles.css">
+  <!-- Konva Canvas Library -->
+  <script src="https://unpkg.com/konva@9/konva.min.js"></script>
 </head>
 <body>
 
-  <!-- Main Menu Box -->
-  <div class="main-menu-container">
+  <!-- MAIN MENU VIEW -->
+  <div id="view-main-menu" class="main-menu-container">
     <div class="menu-header">
       <h1>BlockAid</h1>
       <button id="btn-open-settings" class="btn-icon">⚙ Settings</button>
@@ -37,7 +39,51 @@
     </div>
   </div>
 
-  <!-- Settings Modal (Hidden by Default) -->
+  <!-- EDITING BLUEPRINT CANVAS VIEW -->
+  <div id="view-blueprint-canvas" class="canvas-screen-container" style="display: none;">
+    
+    <!-- Top Ribbon -->
+    <div class="top-ribbon">
+      <div class="ribbon-group-left">
+        <button id="btn-bp-main-menu" class="btn-secondary">Main Menu</button>
+        <button id="btn-bp-save" class="btn-primary btn-save">
+          Save <span id="save-dirty-dot" class="dirty-dot" style="display: none;">●</span>
+        </button>
+        <button id="btn-bp-undo" class="btn-icon" title="Undo">↩ Undo</button>
+        <button id="btn-bp-redo" class="btn-icon" title="Redo">↪ Redo</button>
+      </div>
+
+      <!-- Center Drawing Tools -->
+      <div class="ribbon-group-center">
+        <button id="tool-freehand" class="btn-tool active">✏ Freehand</button>
+        <button id="tool-line" class="btn-tool">📏 Line</button>
+        <button id="tool-box" class="btn-tool">🔲 Box</button>
+        <button id="tool-circle" class="btn-tool">⭕ Circle</button>
+      </div>
+    </div>
+
+    <!-- Middle Working Area -->
+    <div class="canvas-workspace">
+      <!-- Left Floor Ribbon -->
+      <div class="left-floor-ribbon">
+        <span class="floor-title">Floors</span>
+        <div id="floors-list" class="floors-list">
+          <!-- Floor buttons added dynamically -->
+        </div>
+        <button id="btn-add-floor" class="btn-secondary">+ Add Level</button>
+      </div>
+
+      <!-- Interactive Canvas Container -->
+      <div id="konva-holder" class="konva-holder"></div>
+    </div>
+
+    <!-- Bottom Stage Direction Bar -->
+    <div class="bottom-direction-bar">
+      <span>AUDIENCE</span>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
   <div id="settings-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
       <h2 style="color: var(--color-gold); margin-top: 0;">GitHub Settings</h2>

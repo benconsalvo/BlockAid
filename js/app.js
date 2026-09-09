@@ -4,81 +4,40 @@ import {
   saveGitHubConfig, 
   getGitHubConfig, 
   listRepositoryFiles, 
+  fetchFileContent,
+  saveFileToRepository,
   deleteFileFromRepository 
 } from './githubService.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const settingsModal = document.getElementById('settings-modal');
-  const openSettingsBtn = document.getElementById('btn-open-settings');
-  const closeSettingsBtn = document.getElementById('btn-close-settings');
-  const saveSettingsBtn = document.getElementById('btn-save-settings');
-  
-  const ownerInput = document.getElementById('gh-owner');
-  const repoInput = document.getElementById('gh-repo');
-  const tokenInput = document.getElementById('gh-token');
-  const statusMsg = document.getElementById('status-message');
+import { BlueprintEngine } from './canvasEngine.js';
 
-  const blueprintsList = document.getElementById('blueprints-list');
-  const recordingsList = document.getElementById('recordings-list');
-  const createBlueprintBtn = document.getElementById('btn-create-blueprint');
+document.addEventListener('DOMContentLoaded', () => {
+  let engine = null;
+  let currentBlueprintId = null;
+  let currentBlueprintName = '';
+
+  // DOM Elements
+  const viewMainMenu = document.getElementById('view-main-menu');
+  const viewBlueprintCanvas = document.getElementById('view-blueprint-canvas');
+  const settingsModal = document.getElementById('settings-modal');
+  const dirtyDot = document.getElementById('save-dirty-dot');
 
   // Load existing credentials
   const config = getGitHubConfig();
   if (config) {
-    ownerInput.value = config.owner || '';
-    repoInput.value = config.repo || '';
-    tokenInput.value = config.token || '';
     loadData();
   } else {
     settingsModal.style.display = 'flex';
   }
 
-  // Toggle Settings Modal
-  openSettingsBtn.addEventListener('click', () => {
-    settingsModal.style.display = 'flex';
-  });
-
-  closeSettingsBtn.addEventListener('click', () => {
-    settingsModal.style.display = 'none';
-  });
-
-  // Save Settings
-  saveSettingsBtn.addEventListener('click', async () => {
-    const owner = ownerInput.value.trim();
-    const repo = repoInput.value.trim();
-    const token = tokenInput.value.trim();
-
-    if (!owner || !repo || !token) {
-      statusMsg.textContent = 'Please fill in all fields.';
-      statusMsg.style.color = '#FF6B6B';
-      return;
-    }
-
-    saveGitHubConfig(owner, repo, token);
-    statusMsg.textContent = 'Testing connection...';
-    statusMsg.style.color = '#D4AF37';
-
-    try {
-      await listRepositoryFiles('Blueprints');
-      statusMsg.textContent = 'Connected successfully!';
-      statusMsg.style.color = '#51CF66';
-      setTimeout(() => {
-        settingsModal.style.display = 'none';
-        loadData();
-      }, 1000);
-    } catch (err) {
-      statusMsg.textContent = `Connection failed: ${err.message}`;
-      statusMsg.style.color = '#FF6B6B';
-    }
-  });
-
-  // Fetch and Render Blueprints & Recordings
+  // --- MAIN MENU FUNCTIONS ---
   async function loadData() {
     await renderBlueprints();
     await renderRecordings();
   }
 
   async function renderBlueprints() {
+    const blueprintsList = document.getElementById('blueprints-list');
     blueprintsList.innerHTML = '<li class="empty-message">Loading blueprints...</li>';
     try {
       const files = await listRepositoryFiles('Blueprints');
@@ -95,36 +54,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         li.innerHTML = `
           <span class="item-name">${displayName}</span>
           <div class="item-actions">
-            <button class="btn-secondary btn-edit-bp" data-file="${file.path}">Edit</button>
-            <button class="btn-danger btn-delete-bp" data-file="${file.path}">Delete</button>
-            <button class="btn-primary btn-create-blocking" data-file="${file.path}">Create New Blocking</button>
+            <button class="btn-secondary btn-edit-bp" data-path="${file.path}">Edit</button>
+            <button class="btn-danger btn-delete-bp" data-path="${file.path}">Delete</button>
+            <button class="btn-primary btn-create-blocking" data-path="${file.path}">Create New Blocking</button>
           </div>
         `;
         blueprintsList.appendChild(li);
       });
 
-      // Attach button event listeners
+      // Actions
+      document.querySelectorAll('.btn-edit-bp').forEach(btn => {
+        btn.addEventListener('click', (e) => openBlueprintCanvas(e.target.dataset.path));
+      });
+
       document.querySelectorAll('.btn-delete-bp').forEach(btn => {
         btn.addEventListener('click', async (e) => {
-          const filePath = e.target.getAttribute('data-file');
-          if (confirm(`Delete blueprint ${filePath}?`)) {
-            await deleteFileFromRepository(filePath, `Delete blueprint ${filePath}`);
+          if (confirm('Delete this blueprint?')) {
+            await deleteFileFromRepository(e.target.dataset.path);
             renderBlueprints();
           }
-        });
-      });
-
-      document.querySelectorAll('.btn-edit-bp').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const filePath = e.target.getAttribute('data-file');
-          alert(`Edit Blueprint Canvas will open in Phase 3 for: ${filePath}`);
-        });
-      });
-
-      document.querySelectorAll('.btn-create-blocking').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const filePath = e.target.getAttribute('data-file');
-          alert(`Recording Canvas will open in Phase 4 for blueprint: ${filePath}`);
         });
       });
 
@@ -134,6 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function renderRecordings() {
+    const recordingsList = document.getElementById('recordings-list');
     recordingsList.innerHTML = '<li class="empty-message">Loading saved blockings...</li>';
     try {
       const files = await listRepositoryFiles('Recordings');
@@ -141,7 +90,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         recordingsList.innerHTML = '<li class="empty-message">No saved blockings found.</li>';
         return;
       }
-
       recordingsList.innerHTML = '';
       files.forEach(file => {
         const displayName = file.name.replace('.json', '');
@@ -150,36 +98,112 @@ document.addEventListener('DOMContentLoaded', async () => {
         li.innerHTML = `
           <span class="item-name">${displayName}</span>
           <div class="item-actions">
-            <button class="btn-secondary btn-edit-rec" data-file="${file.path}">Edit</button>
-            <button class="btn-danger btn-delete-rec" data-file="${file.path}">Delete</button>
+            <button class="btn-secondary btn-edit-rec" data-path="${file.path}">Edit</button>
+            <button class="btn-danger btn-delete-rec" data-path="${file.path}">Delete</button>
           </div>
         `;
         recordingsList.appendChild(li);
       });
-
-      document.querySelectorAll('.btn-delete-rec').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const filePath = e.target.getAttribute('data-file');
-          if (confirm(`Delete blocking ${filePath}?`)) {
-            await deleteFileFromRepository(filePath, `Delete blocking ${filePath}`);
-            renderRecordings();
-          }
-        });
-      });
-
-      document.querySelectorAll('.btn-edit-rec').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const filePath = e.target.getAttribute('data-file');
-          alert(`Edit Blocking Canvas will open in Phase 4 for: ${filePath}`);
-        });
-      });
-
     } catch (err) {
       recordingsList.innerHTML = `<li class="empty-message" style="color: #FF6B6B;">Error: ${err.message}</li>`;
     }
   }
 
-  createBlueprintBtn.addEventListener('click', () => {
-    alert('New Blueprint Canvas will open in Phase 3.');
-  });
+  // --- CANVAS INITIALIZATION ---
+  async function openBlueprintCanvas(filePath = null) {
+    viewMainMenu.style.display = 'none';
+    viewBlueprintCanvas.style.display = 'flex';
+
+    if (!engine) {
+      engine = new BlueprintEngine('konva-holder');
+      engine.init();
+      engine.onDirtyChangeCallback = (isDirty) => {
+        dirtyDot.style.display = isDirty ? 'inline' : 'none';
+      };
+      bindCanvasToolEvents();
+    }
+
+    if (filePath) {
+      const fileData = await fetchFileContent(filePath);
+      currentBlueprintId = fileData.content.id;
+      currentBlueprintName = fileData.content.name;
+      engine.loadJSON(fileData.content);
+    } else {
+      currentBlueprintId = `bp_${Date.now()}`;
+      currentBlueprintName = prompt('Enter Blueprint Name:', 'New Stage Blueprint') || 'New Stage Blueprint';
+      engine.loadJSON({ floors: [{ level: 1, layerData: null }] });
+    }
+
+    renderFloorButtons();
+  }
+
+  function renderFloorButtons() {
+    const floorsList = document.getElementById('floors-list');
+    floorsList.innerHTML = '';
+    
+    Object.keys(engine.floorsData).forEach(floorNum => {
+      const num = parseInt(floorNum);
+      const btn = document.createElement('button');
+      btn.className = `btn-floor ${num === engine.activeFloor ? 'active' : ''}`;
+      btn.textContent = `Level ${num}`;
+      btn.addEventListener('click', () => {
+        engine.switchFloor(num);
+        renderFloorButtons();
+      });
+      floorsList.appendChild(btn);
+    });
+  }
+
+  function bindCanvasToolEvents() {
+    // Main Menu Button
+    document.getElementById('btn-bp-main-menu').addEventListener('click', async () => {
+      if (engine.isDirty) {
+        if (confirm('You have unsaved changes. Would you like to save before leaving?')) {
+          await saveBlueprintData();
+        }
+      }
+      viewBlueprintCanvas.style.display = 'none';
+      viewMainMenu.style.display = 'block';
+      loadData();
+    });
+
+    // Save Button
+    document.getElementById('btn-bp-save').addEventListener('click', saveBlueprintData);
+
+    // Undo / Redo
+    document.getElementById('btn-bp-undo').addEventListener('click', () => engine.undo());
+    document.getElementById('btn-bp-redo').addEventListener('click', () => engine.redo());
+
+    // Tools
+    const tools = ['freehand', 'line', 'box', 'circle'];
+    tools.forEach(tool => {
+      document.getElementById(`tool-${tool}`).addEventListener('click', (e) => {
+        tools.forEach(t => document.getElementById(`tool-${t}`).classList.remove('active'));
+        e.target.classList.add('active');
+        engine.setTool(tool);
+      });
+    });
+
+    // Add Floor
+    document.getElementById('btn-add-floor').addEventListener('click', () => {
+      engine.addFloor();
+      renderFloorButtons();
+    });
+  }
+
+  async function saveBlueprintData() {
+    const exportData = engine.exportJSON(currentBlueprintId, currentBlueprintName);
+    const fileName = `${currentBlueprintName.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`;
+    
+    try {
+      await saveFileToRepository('Blueprints', fileName, exportData, `Save blueprint ${currentBlueprintName}`);
+      engine.setDirty(false);
+      alert('Blueprint saved successfully!');
+    } catch (err) {
+      alert(`Save failed: ${err.message}`);
+    }
+  }
+
+  // Bind New Blueprint button
+  document.getElementById('btn-create-blueprint').addEventListener('click', () => openBlueprintCanvas());
 });
