@@ -367,75 +367,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-bp-undo').addEventListener('click', () => engine.undo());
     document.getElementById('btn-bp-redo').addEventListener('click', () => engine.redo());
 
-    // COLOR PICKER UNDER BUTTON POPOVER + CENTERED SPECTRUM MODAL
+    // DIRECT NATIVE COLOR PICKER TRIGGER
     const colorBtn = document.getElementById('btn-color-picker');
-    const colorPopover = document.getElementById('color-popover');
-    const openSpectrumBtn = document.getElementById('btn-open-spectrum-modal');
-    const spectrumModal = document.getElementById('spectrum-modal');
-    const closeSpectrumBtn = document.getElementById('btn-close-spectrum-modal');
-    
+    const colorInput = document.getElementById('tool-color-input');
     const previewDot = document.getElementById('color-preview-dot');
-    const popoverHexInput = document.getElementById('hex-color-input');
-    const modalHexInput = document.getElementById('modal-hex-color-input');
-    const fullColorInput = document.getElementById('full-color-input');
 
-    const updateColor = (colorHex) => {
-      engine.setColor(colorHex);
-      previewDot.style.backgroundColor = colorHex;
-      popoverHexInput.value = colorHex.toUpperCase();
-      modalHexInput.value = colorHex.toUpperCase();
-      fullColorInput.value = colorHex;
-    };
-
-    // Toggle popover directly under the button
-    colorBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      colorPopover.style.display = colorPopover.style.display === 'none' ? 'block' : 'none';
+    colorBtn.addEventListener('click', () => {
+      colorInput.click();
     });
 
-    // Popover Hex Input listener
-    popoverHexInput.addEventListener('input', (e) => {
-      let val = e.target.value.trim();
-      if (!val.startsWith('#')) val = '#' + val;
-      if (/^#[0-9A-F]{6}$/i.test(val)) {
-        updateColor(val);
-      }
-    });
-
-    // Open centered modal when clicking "Color Wheel / Spectrum"
-    openSpectrumBtn.addEventListener('click', () => {
-      colorPopover.style.display = 'none';
-      spectrumModal.style.display = 'flex';
-    });
-
-    // Modal color pickers listeners
-    fullColorInput.addEventListener('input', (e) => {
-      updateColor(e.target.value);
-    });
-
-    modalHexInput.addEventListener('input', (e) => {
-      let val = e.target.value.trim();
-      if (!val.startsWith('#')) val = '#' + val;
-      if (/^#[0-9A-F]{6}$/i.test(val)) {
-        updateColor(val);
-      }
-    });
-
-    closeSpectrumBtn.addEventListener('click', () => {
-      spectrumModal.style.display = 'none';
-    });
-
-    spectrumModal.addEventListener('click', (e) => {
-      if (e.target === spectrumModal) {
-        spectrumModal.style.display = 'none';
-      }
-    });
-
-    // Dismiss popover when clicking outside
-    document.addEventListener('click', (e) => {
-      if (colorPopover && !colorPopover.contains(e.target) && e.target !== colorBtn && !colorBtn.contains(e.target)) {
-        colorPopover.style.display = 'none';
-      }
+    colorInput.addEventListener('input', (e) => {
+      const selectedColor = e.target.value;
+      engine.setColor(selectedColor);
+      previewDot.style.backgroundColor = selectedColor;
     });
 
     // Keyboard Shortcuts for Undo (Ctrl+Z / Cmd+Z) and Redo (Ctrl+Y / Cmd+Y / Ctrl+Shift+Z)
