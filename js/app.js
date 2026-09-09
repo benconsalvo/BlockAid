@@ -460,8 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Tools handling (Including Move Canvas & Eraser)
-    const tools = ['cursor', 'freehand', 'line', 'box', 'circle', 'fill', 'eraser'];
+    // Drawing Tools handling
+    const tools = ['freehand', 'line', 'box', 'circle', 'fill', 'eraser'];
     tools.forEach(tool => {
       document.getElementById(`tool-${tool}`).addEventListener('click', (e) => {
         tools.forEach(t => document.getElementById(`tool-${t}`).classList.remove('active'));

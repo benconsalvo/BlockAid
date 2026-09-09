@@ -27,7 +27,7 @@ export class BlueprintEngine {
     this.gridLayer = null;
     this.layer = null;
     
-    this.activeTool = 'freehand'; // 'cursor', 'freehand', 'line', 'box', 'circle', 'fill', 'eraser'
+    this.activeTool = 'freehand'; // 'freehand', 'line', 'box', 'circle', 'fill', 'eraser'
     this.strokeColor = '#1C1C1C';
     this.activeFloor = 1;
     this.floorsData = { 1: null };
@@ -44,7 +44,9 @@ export class BlueprintEngine {
     this.onDirtyChangeCallback = null;
     this.onZoomChangeCallback = null;
 
-    // iPad 2-finger Pan/Zoom state
+    // Right click & iPad 2-finger panning state
+    this.isRightClickPanning = false;
+    this.lastPanPointer = null;
     this.lastCenter = null;
     this.lastDist = 0;
   }
@@ -174,13 +176,7 @@ export class BlueprintEngine {
 
   setTool(tool) {
     this.activeTool = tool;
-    if (tool === 'cursor') {
-      this.stage.draggable(true);
-      this.container.style.cursor = 'grab';
-    } else {
-      this.stage.draggable(false);
-      this.container.style.cursor = tool === 'eraser' ? 'crosshair' : 'crosshair';
-    }
+    this.container.style.cursor = 'crosshair';
   }
 
   setColor(color) {
@@ -188,6 +184,11 @@ export class BlueprintEngine {
   }
 
   bindEvents() {
+    // Disable right-click context menu over canvas to allow smooth right-click drag panning
+    this.stage.on('contextmenu', (e) => {
+      e.evt.preventDefault();
+    });
+
     // Mouse wheel zoom support
     this.stage.on('wheel', (e) => {
       e.evt.preventDefault();
@@ -220,7 +221,6 @@ export class BlueprintEngine {
     this.stage.on('touchstart touchmove', (e) => {
       const touches = e.evt.touches;
       if (touches && touches.length === 2) {
-        // Cancel active drawing line if second finger touches screen
         if (this.isDrawing) {
           this.isDrawing = false;
           if (this.currentShape) {
@@ -279,11 +279,17 @@ export class BlueprintEngine {
 
     this.stage.on('mousedown touchstart', (e) => this.handlePointerDown(e));
     this.stage.on('mousemove touchmove', (e) => this.handlePointerMove(e));
-    this.stage.on('mouseup touchend', () => this.handlePointerUp());
+    this.stage.on('mouseup touchend mouseleave', () => this.handlePointerUp());
   }
 
   handlePointerDown(e) {
-    if (this.activeTool === 'cursor') return; // Canvas movement handled by Konva stage drag
+    // Check for Right Click Drag (Mouse Button 2) to Pan Canvas
+    if (e.evt && e.evt.button === 2) {
+      this.isRightClickPanning = true;
+      this.lastPanPointer = { x: e.evt.clientX, y: e.evt.clientY };
+      this.container.style.cursor = 'grabbing';
+      return;
+    }
 
     const rawPos = this.stage.getPointerPosition();
     if (!rawPos) return;
@@ -301,7 +307,7 @@ export class BlueprintEngine {
 
     this.isDrawing = true;
 
-    // --- NORMAL STROKE ERASER (destination-out cuts through objects on drag) ---
+    // Natural Drag Eraser (destination-out cuts through existing strokes)
     if (this.activeTool === 'eraser') {
       this.currentShape = new Konva.Line({
         stroke: '#000000',
@@ -354,7 +360,22 @@ export class BlueprintEngine {
   }
 
   handlePointerMove(e) {
-    if (!this.isDrawing || !this.currentShape || this.activeTool === 'cursor') return;
+    // Handle Right-click Pan Drag
+    if (this.isRightClickPanning && e.evt) {
+      const dx = e.evt.clientX - this.lastPanPointer.x;
+      const dy = e.evt.clientY - this.lastPanPointer.y;
+
+      this.stage.position({
+        x: this.stage.x() + dx,
+        y: this.stage.y() + dy
+      });
+
+      this.lastPanPointer = { x: e.evt.clientX, y: e.evt.clientY };
+      this.stage.batchDraw();
+      return;
+    }
+
+    if (!this.isDrawing || !this.currentShape) return;
 
     const rawPos = this.stage.getPointerPosition();
     if (!rawPos) return;
@@ -386,6 +407,12 @@ export class BlueprintEngine {
   }
 
   handlePointerUp() {
+    if (this.isRightClickPanning) {
+      this.isRightClickPanning = false;
+      this.container.style.cursor = 'crosshair';
+      return;
+    }
+
     if (!this.isDrawing) return;
     this.isDrawing = false;
     if (this.currentShape) {
