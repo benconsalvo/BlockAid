@@ -10,6 +10,7 @@ export class BlueprintEngine {
     this.activeFloor = 1;
     this.floorsData = { 1: null };
     this.floorNames = { 1: 'Level 1' };
+    this.floorOrder = [1]; // Tracks exact display sequence
 
     this.undoStack = [];
     this.redoStack = [];
@@ -21,7 +22,7 @@ export class BlueprintEngine {
   }
 
   init() {
-    const width = this.container.offsetWidth || window.innerWidth - 150;
+    const width = this.container.offsetWidth || window.innerWidth - 160;
     const height = this.container.offsetHeight || window.innerHeight - 96;
 
     this.stage = new Konva.Stage({
@@ -179,6 +180,11 @@ export class BlueprintEngine {
     }
   }
 
+  reorderFloors(newOrder) {
+    this.floorOrder = newOrder;
+    this.setDirty(true);
+  }
+
   switchFloor(floorLevel) {
     this.floorsData[this.activeFloor] = this.layer.toJSON();
     this.activeFloor = floorLevel;
@@ -197,6 +203,7 @@ export class BlueprintEngine {
     const nextFloor = Object.keys(this.floorsData).length + 1;
     this.floorsData[nextFloor] = null;
     this.floorNames[nextFloor] = `Level ${nextFloor}`;
+    this.floorOrder.push(nextFloor);
     this.switchFloor(nextFloor);
     this.setDirty(true);
     return nextFloor;
@@ -205,7 +212,7 @@ export class BlueprintEngine {
   exportJSON(blueprintId, blueprintName) {
     this.floorsData[this.activeFloor] = this.layer.toJSON();
     
-    const floorsArray = Object.keys(this.floorsData).map(level => ({
+    const floorsArray = this.floorOrder.map(level => ({
       level: parseInt(level),
       name: this.floorNames[level] || `Level ${level}`,
       layerData: this.floorsData[level]
@@ -222,17 +229,20 @@ export class BlueprintEngine {
   loadJSON(blueprintData) {
     this.floorsData = {};
     this.floorNames = {};
+    this.floorOrder = [];
     if (blueprintData.floors && blueprintData.floors.length > 0) {
       blueprintData.floors.forEach(f => {
         this.floorsData[f.level] = f.layerData;
         this.floorNames[f.level] = f.name || `Level ${f.level}`;
+        this.floorOrder.push(f.level);
       });
     } else {
       this.floorsData[1] = null;
       this.floorNames[1] = 'Level 1';
+      this.floorOrder = [1];
     }
-    this.activeFloor = 1;
-    this.switchFloor(1);
+    this.activeFloor = this.floorOrder[0] || 1;
+    this.switchFloor(this.activeFloor);
     this.undoStack = [];
     this.redoStack = [];
     this.setDirty(false);

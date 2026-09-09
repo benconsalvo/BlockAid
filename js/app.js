@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let engine = null;
   let currentBlueprintId = null;
   let currentBlueprintName = '';
+  let draggedIndex = null;
 
   const viewMainMenu = document.getElementById('view-main-menu');
   const viewBlueprintCanvas = document.getElementById('view-blueprint-canvas');
@@ -273,12 +274,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const floorsList = document.getElementById('floors-list');
     floorsList.innerHTML = '';
     
-    Object.keys(engine.floorsData).forEach(floorNum => {
+    engine.floorOrder.forEach((floorNum, index) => {
       const num = parseInt(floorNum);
       const floorName = engine.floorNames[num] || `Level ${num}`;
 
       const row = document.createElement('div');
       row.className = 'floor-row';
+      row.draggable = true;
+      row.dataset.index = index;
+
+      // Drag and Drop Event Handlers
+      row.addEventListener('dragstart', (e) => {
+        draggedIndex = index;
+        row.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      row.addEventListener('dragend', () => {
+        row.classList.remove('dragging');
+        document.querySelectorAll('.floor-row').forEach(r => r.classList.remove('drag-over'));
+      });
+
+      row.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        row.classList.add('drag-over');
+      });
+
+      row.addEventListener('dragleave', () => {
+        row.classList.remove('drag-over');
+      });
+
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        row.classList.remove('drag-over');
+        if (draggedIndex !== null && draggedIndex !== index) {
+          const newOrder = [...engine.floorOrder];
+          const [movedItem] = newOrder.splice(draggedIndex, 1);
+          newOrder.splice(index, 0, movedItem);
+          engine.reorderFloors(newOrder);
+          renderFloorButtons();
+        }
+      });
+
+      const handle = document.createElement('span');
+      handle.className = 'drag-handle';
+      handle.innerHTML = '⋮⋮';
+      handle.title = 'Drag to reorder';
 
       const btn = document.createElement('button');
       btn.className = `btn-floor ${num === engine.activeFloor ? 'active' : ''}`;
@@ -302,6 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
+      row.appendChild(handle);
       row.appendChild(btn);
       row.appendChild(renameBtn);
       floorsList.appendChild(row);

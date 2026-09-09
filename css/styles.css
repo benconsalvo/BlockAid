@@ -297,7 +297,7 @@ body {
 
 /* LEFT FLOOR RIBBON */
 .left-floor-ribbon {
-  width: 150px;
+  width: 160px;
   background-color: var(--color-card);
   border-right: 1px solid #444;
   display: flex;
@@ -327,6 +327,30 @@ body {
   align-items: center;
   gap: 4px;
   width: 100%;
+  cursor: grab;
+  padding: 2px;
+  border-radius: 6px;
+  transition: border 0.15s ease, opacity 0.15s ease;
+}
+
+.floor-row:active {
+  cursor: grabbing;
+}
+
+.floor-row.dragging {
+  opacity: 0.3;
+}
+
+.floor-row.drag-over {
+  border: 2px dashed var(--color-gold);
+}
+
+.drag-handle {
+  color: var(--color-text-muted);
+  cursor: grab;
+  font-size: 14px;
+  padding: 0 2px;
+  user-select: none;
 }
 
 .btn-floor {
@@ -334,7 +358,7 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   border: 1px solid #555;
-  padding: 8px;
+  padding: 8px 6px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
