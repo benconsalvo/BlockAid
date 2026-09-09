@@ -1,0 +1,11 @@
+{
+  "id": "bp_1788916299893",
+  "name": "New Stage Blueprintasd",
+  "updatedAt": "2026-09-09T01:11:43.177Z",
+  "floors": [
+    {
+      "level": 1,
+      "layerData": "{\"attrs\":{},\"className\":\"Layer\",\"children\":[]}"
+    }
+  ]
+}
