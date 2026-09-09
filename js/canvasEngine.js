@@ -8,8 +8,9 @@ export class BlueprintEngine {
     
     this.activeTool = 'freehand'; // 'freehand', 'line', 'box', 'circle'
     this.activeFloor = 1;
-    this.floorsData = { 1: [] }; // { floorLevel: [konvaShapes] }
-    
+    this.floorsData = { 1: null };
+    this.floorNames = { 1: 'Level 1' };
+
     this.undoStack = [];
     this.redoStack = [];
     this.isDirty = false;
@@ -20,8 +21,8 @@ export class BlueprintEngine {
   }
 
   init() {
-    const width = this.container.offsetWidth;
-    const height = this.container.offsetHeight;
+    const width = this.container.offsetWidth || window.innerWidth - 150;
+    const height = this.container.offsetHeight || window.innerHeight - 96;
 
     this.stage = new Konva.Stage({
       container: this.container.id,
@@ -33,6 +34,13 @@ export class BlueprintEngine {
     this.stage.add(this.layer);
 
     this.bindEvents();
+
+    window.addEventListener('resize', () => {
+      if (this.stage && this.container) {
+        this.stage.width(this.container.offsetWidth);
+        this.stage.height(this.container.offsetHeight);
+      }
+    });
   }
 
   setDirty(dirty) {
@@ -60,7 +68,6 @@ export class BlueprintEngine {
       this.currentShape = new Konva.Line({
         stroke: '#1C1C1C',
         strokeWidth: 3,
-        globalCompositeOperation: 'source-over',
         points: [pos.x, pos.y, pos.x, pos.y],
         tension: 0.5,
         lineCap: 'round',
@@ -134,9 +141,8 @@ export class BlueprintEngine {
   }
 
   saveState() {
-    const jsonState = this.layer.toJSON();
-    this.undoStack.push(jsonState);
-    this.redoStack = []; // Reset redo stack on new action
+    this.undoStack.push(this.layer.toJSON());
+    this.redoStack = [];
   }
 
   undo() {
@@ -166,35 +172,42 @@ export class BlueprintEngine {
     this.setDirty(true);
   }
 
+  renameFloor(floorLevel, newName) {
+    if (newName && newName.trim()) {
+      this.floorNames[floorLevel] = newName.trim();
+      this.setDirty(true);
+    }
+  }
+
   switchFloor(floorLevel) {
-    // Save current floor shapes
     this.floorsData[this.activeFloor] = this.layer.toJSON();
     this.activeFloor = floorLevel;
 
-    // Load target floor shapes
     this.layer.destroyChildren();
     if (this.floorsData[floorLevel]) {
       const loadedLayer = Konva.Node.create(this.floorsData[floorLevel]);
       loadedLayer.getChildren().forEach(child => this.layer.add(child.clone()));
     } else {
-      this.floorsData[floorLevel] = [];
+      this.floorsData[floorLevel] = null;
     }
     this.layer.batchDraw();
   }
 
   addFloor() {
     const nextFloor = Object.keys(this.floorsData).length + 1;
-    this.floorsData[nextFloor] = [];
+    this.floorsData[nextFloor] = null;
+    this.floorNames[nextFloor] = `Level ${nextFloor}`;
     this.switchFloor(nextFloor);
+    this.setDirty(true);
     return nextFloor;
   }
 
   exportJSON(blueprintId, blueprintName) {
-    // Sync active floor first
     this.floorsData[this.activeFloor] = this.layer.toJSON();
     
     const floorsArray = Object.keys(this.floorsData).map(level => ({
       level: parseInt(level),
+      name: this.floorNames[level] || `Level ${level}`,
       layerData: this.floorsData[level]
     }));
 
@@ -208,9 +221,16 @@ export class BlueprintEngine {
 
   loadJSON(blueprintData) {
     this.floorsData = {};
-    blueprintData.floors.forEach(f => {
-      this.floorsData[f.level] = f.layerData;
-    });
+    this.floorNames = {};
+    if (blueprintData.floors && blueprintData.floors.length > 0) {
+      blueprintData.floors.forEach(f => {
+        this.floorsData[f.level] = f.layerData;
+        this.floorNames[f.level] = f.name || `Level ${f.level}`;
+      });
+    } else {
+      this.floorsData[1] = null;
+      this.floorNames[1] = 'Level 1';
+    }
     this.activeFloor = 1;
     this.switchFloor(1);
     this.undoStack = [];

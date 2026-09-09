@@ -275,14 +275,36 @@ document.addEventListener('DOMContentLoaded', () => {
     
     Object.keys(engine.floorsData).forEach(floorNum => {
       const num = parseInt(floorNum);
+      const floorName = engine.floorNames[num] || `Level ${num}`;
+
+      const row = document.createElement('div');
+      row.className = 'floor-row';
+
       const btn = document.createElement('button');
       btn.className = `btn-floor ${num === engine.activeFloor ? 'active' : ''}`;
-      btn.textContent = `Level ${num}`;
+      btn.textContent = floorName;
+      btn.title = floorName;
       btn.addEventListener('click', () => {
         engine.switchFloor(num);
         renderFloorButtons();
       });
-      floorsList.appendChild(btn);
+
+      const renameBtn = document.createElement('button');
+      renameBtn.className = 'btn-floor-rename';
+      renameBtn.innerHTML = '✏️';
+      renameBtn.title = 'Rename Level';
+      renameBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const newName = await customPrompt('Rename Level:', floorName, 'Rename Level');
+        if (newName && newName.trim()) {
+          engine.renameFloor(num, newName.trim());
+          renderFloorButtons();
+        }
+      });
+
+      row.appendChild(btn);
+      row.appendChild(renameBtn);
+      floorsList.appendChild(row);
     });
   }
 

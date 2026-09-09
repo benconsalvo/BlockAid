@@ -295,14 +295,16 @@ body {
   overflow: hidden;
 }
 
+/* LEFT FLOOR RIBBON */
 .left-floor-ribbon {
-  width: 120px;
+  width: 150px;
   background-color: var(--color-card);
   border-right: 1px solid #444;
   display: flex;
   flex-direction: column;
   padding: 12px 8px;
-  gap: 12px;
+  gap: 8px;
+  overflow-y: auto;
 }
 
 .floor-title {
@@ -311,25 +313,35 @@ body {
   font-weight: bold;
   text-transform: uppercase;
   text-align: center;
+  margin-bottom: 4px;
 }
 
 .floors-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex: 1;
-  overflow-y: auto;
+}
+
+.floor-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
 }
 
 .btn-floor {
+  flex: 1;
   background-color: var(--color-bg);
   color: var(--color-text);
   border: 1px solid #555;
-  padding: 10px;
+  padding: 8px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-floor.active {
@@ -337,6 +349,25 @@ body {
   color: white;
   border-color: var(--color-gold);
   font-weight: bold;
+}
+
+.btn-floor-rename {
+  background: none;
+  border: 1px solid #555;
+  color: var(--color-text-muted);
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-floor-rename:hover {
+  color: var(--color-gold);
+  border-color: var(--color-gold);
+  background-color: var(--color-bg);
 }
 
 .konva-holder {
