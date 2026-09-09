@@ -52,26 +52,35 @@
         <button id="btn-bp-save" class="btn-primary btn-save">
           Save <span id="save-dirty-dot" class="dirty-dot" style="display: none;">●</span>
         </button>
-        <button id="btn-bp-undo" class="btn-icon" title="Undo">↩ Undo</button>
-        <button id="btn-bp-redo" class="btn-icon" title="Redo">↪ Redo</button>
+        <button id="btn-bp-undo" class="btn-icon" title="Undo (Ctrl+Z)">↩ Undo</button>
+        <button id="btn-bp-redo" class="btn-icon" title="Redo (Ctrl+Y)">↪ Redo</button>
       </div>
 
-      <!-- Center Drawing Tools -->
+      <!-- Center Drawing & Polish Tools -->
       <div class="ribbon-group-center">
         <button id="tool-freehand" class="btn-tool active">✏ Freehand</button>
         <button id="tool-line" class="btn-tool">📏 Line</button>
         <button id="tool-box" class="btn-tool">🔲 Box</button>
         <button id="tool-circle" class="btn-tool">⭕ Circle</button>
         <button id="tool-fill" class="btn-tool">🪣 Fill</button>
+        <button id="tool-eraser" class="btn-tool">🧽 Eraser</button>
         
-        <!-- Pen Color Button (Triggers System Color Window) -->
+        <!-- Pen Color Trigger Button -->
         <button id="btn-color-picker" class="btn-tool color-picker-btn" title="Change Pen Color">
           🎨 Color <span id="color-preview-dot" class="color-preview-dot"></span>
         </button>
-        <input type="color" id="tool-color-input" value="#1C1C1C" style="display: none;">
+
+        <!-- Polish Tool: Grid Toggle -->
+        <button id="btn-toggle-grid" class="btn-tool active" title="Toggle Grid Lines">📐 Grid: ON</button>
       </div>
 
-      <div class="ribbon-group-right"></div>
+      <!-- Right Zoom Controls -->
+      <div class="ribbon-group-right">
+        <button id="btn-zoom-out" class="btn-icon" title="Zoom Out">-</button>
+        <span id="zoom-level-text" class="zoom-display">100%</span>
+        <button id="btn-zoom-in" class="btn-icon" title="Zoom In">+</button>
+        <button id="btn-zoom-reset" class="btn-secondary" title="Reset Zoom & Position">Reset View</button>
+      </div>
     </div>
 
     <!-- Middle Working Area -->
@@ -90,6 +99,44 @@
     <!-- Bottom Stage Direction Bar -->
     <div class="bottom-direction-bar">
       <span>AUDIENCE</span>
+    </div>
+  </div>
+
+  <!-- CENTERED HTML PEN COLOR MODAL (Always opens in exact screen center) -->
+  <div id="color-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content dialog-card" style="max-width: 320px;">
+      <h3 class="dialog-title" style="text-align: center; margin-bottom: 16px;">Select Pen Color</h3>
+      
+      <!-- Preset Color Swatches -->
+      <div class="color-swatches-title">Phoenix & Classic Palette</div>
+      <div class="color-swatches-grid">
+        <button class="color-swatch active" data-color="#1C1C1C" style="background-color: #1C1C1C;" title="Dark Charcoal"></button>
+        <button class="color-swatch" data-color="#7C1013" style="background-color: #7C1013;" title="Deep Crimson"></button>
+        <button class="color-swatch" data-color="#D4AF37" style="background-color: #D4AF37;" title="Phoenix Gold"></button>
+        <button class="color-swatch" data-color="#F4F4F6" style="background-color: #F4F4F6;" title="Off-White"></button>
+        <button class="color-swatch" data-color="#D9534F" style="background-color: #D9534F;" title="Bright Red"></button>
+        <button class="color-swatch" data-color="#51CF66" style="background-color: #51CF66;" title="Green"></button>
+        <button class="color-swatch" data-color="#4A90E2" style="background-color: #4A90E2;" title="Blue"></button>
+        <button class="color-swatch" data-color="#F5A623" style="background-color: #F5A623;" title="Orange"></button>
+        <button class="color-swatch" data-color="#9013FE" style="background-color: #9013FE;" title="Purple"></button>
+        <button class="color-swatch" data-color="#000000" style="background-color: #000000;" title="Pure Black"></button>
+      </div>
+
+      <!-- Color Wheel / Custom Input Box -->
+      <div class="color-picker-main-row" style="margin-top: 16px;">
+        <label for="full-color-input" class="full-color-label">Custom Color Wheel:</label>
+        <input type="color" id="full-color-input" value="#1C1C1C" class="full-color-input">
+      </div>
+
+      <!-- HEX Input -->
+      <div class="hex-input-row">
+        <label for="modal-hex-color-input">HEX Code:</label>
+        <input type="text" id="modal-hex-color-input" value="#1C1C1C" maxlength="7" placeholder="#1C1C1C">
+      </div>
+
+      <div class="dialog-actions" style="margin-top: 20px;">
+        <button id="btn-close-color-modal" class="btn-primary" style="width: 100%;">Done</button>
+      </div>
     </div>
   </div>
 

@@ -24,14 +24,16 @@ export class BlueprintEngine {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
     this.stage = null;
+    this.gridLayer = null;
     this.layer = null;
     
-    this.activeTool = 'freehand'; // 'freehand', 'line', 'box', 'circle', 'fill'
+    this.activeTool = 'freehand'; // 'freehand', 'line', 'box', 'circle', 'fill', 'eraser'
     this.strokeColor = '#1C1C1C';
     this.activeFloor = 1;
     this.floorsData = { 1: null };
     this.floorNames = { 1: 'Level 1' };
     this.floorOrder = [1];
+    this.showGrid = true;
 
     this.undoStack = [];
     this.redoStack = [];
@@ -40,6 +42,7 @@ export class BlueprintEngine {
     this.currentShape = null;
 
     this.onDirtyChangeCallback = null;
+    this.onZoomChangeCallback = null;
   }
 
   init() {
@@ -50,19 +53,112 @@ export class BlueprintEngine {
       container: this.container.id,
       width: width,
       height: height,
+      draggable: false
     });
 
+    // Create grid layer behind shapes
+    this.gridLayer = new Konva.Layer({ listening: false });
+    this.stage.add(this.gridLayer);
+
+    // Create main drawing layer
     this.layer = new Konva.Layer();
     this.stage.add(this.layer);
 
+    this.drawGrid();
     this.bindEvents();
 
     window.addEventListener('resize', () => {
       if (this.stage && this.container) {
         this.stage.width(this.container.offsetWidth);
         this.stage.height(this.container.offsetHeight);
+        this.drawGrid();
       }
     });
+  }
+
+  // --- FEATURE 2: GRID LINES ---
+  toggleGrid() {
+    this.showGrid = !this.showGrid;
+    this.drawGrid();
+    return this.showGrid;
+  }
+
+  drawGrid() {
+    this.gridLayer.destroyChildren();
+    if (!this.showGrid) {
+      this.gridLayer.batchDraw();
+      return;
+    }
+
+    const gridSize = 30;
+    const width = 4000;
+    const height = 4000;
+
+    for (let i = 0; i < width / gridSize; i++) {
+      this.gridLayer.add(new Konva.Line({
+        points: [i * gridSize, 0, i * gridSize, height],
+        stroke: '#BBBBBB',
+        strokeWidth: 1,
+        opacity: 0.35,
+        dash: [2, 2]
+      }));
+    }
+
+    for (let j = 0; j < height / gridSize; j++) {
+      this.gridLayer.add(new Konva.Line({
+        points: [0, j * gridSize, width, j * gridSize],
+        stroke: '#BBBBBB',
+        strokeWidth: 1,
+        opacity: 0.35,
+        dash: [2, 2]
+      }));
+    }
+
+    this.gridLayer.batchDraw();
+  }
+
+  // --- FEATURE 3: ZOOM & PAN ---
+  zoomIn() {
+    const oldScale = this.stage.scaleX();
+    const newScale = Math.min(oldScale * 1.2, 5);
+    this.setStageScale(newScale);
+  }
+
+  zoomOut() {
+    const oldScale = this.stage.scaleX();
+    const newScale = Math.max(oldScale / 1.2, 0.3);
+    this.setStageScale(newScale);
+  }
+
+  resetZoom() {
+    this.stage.scale({ x: 1, y: 1 });
+    this.stage.position({ x: 0, y: 0 });
+    this.stage.batchDraw();
+    if (this.onZoomChangeCallback) this.onZoomChangeCallback(1);
+  }
+
+  setStageScale(newScale) {
+    const center = {
+      x: this.stage.width() / 2,
+      y: this.stage.height() / 2
+    };
+
+    const mousePointTo = {
+      x: (center.x - this.stage.x()) / this.stage.scaleX(),
+      y: (center.y - this.stage.y()) / this.stage.scaleY()
+    };
+
+    this.stage.scale({ x: newScale, y: newScale });
+
+    const newPos = {
+      x: center.x - mousePointTo.x * newScale,
+      y: center.y - mousePointTo.y * newScale
+    };
+
+    this.stage.position(newPos);
+    this.stage.batchDraw();
+
+    if (this.onZoomChangeCallback) this.onZoomChangeCallback(newScale);
   }
 
   setDirty(dirty) {
@@ -74,6 +170,7 @@ export class BlueprintEngine {
 
   setTool(tool) {
     this.activeTool = tool;
+    this.container.style.cursor = tool === 'eraser' ? 'pointer' : 'crosshair';
   }
 
   setColor(color) {
@@ -81,14 +178,61 @@ export class BlueprintEngine {
   }
 
   bindEvents() {
+    // Mouse wheel zoom support
+    this.stage.on('wheel', (e) => {
+      e.evt.preventDefault();
+      const oldScale = this.stage.scaleX();
+      const pointer = this.stage.getPointerPosition();
+
+      const mousePointTo = {
+        x: (pointer.x - this.stage.x()) / oldScale,
+        y: (pointer.y - this.stage.y()) / oldScale
+      };
+
+      const scaleBy = 1.1;
+      const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+      const clampedScale = Math.max(0.3, Math.min(5, newScale));
+
+      this.stage.scale({ x: clampedScale, y: clampedScale });
+
+      const newPos = {
+        x: pointer.x - mousePointTo.x * clampedScale,
+        y: pointer.y - mousePointTo.y * clampedScale
+      };
+
+      this.stage.position(newPos);
+      this.stage.batchDraw();
+
+      if (this.onZoomChangeCallback) this.onZoomChangeCallback(clampedScale);
+    });
+
     this.stage.on('mousedown touchstart', (e) => this.handlePointerDown(e));
     this.stage.on('mousemove touchmove', (e) => this.handlePointerMove(e));
     this.stage.on('mouseup touchend', () => this.handlePointerUp());
   }
 
   handlePointerDown(e) {
-    const pos = this.stage.getPointerPosition();
-    if (!pos) return;
+    const rawPos = this.stage.getPointerPosition();
+    if (!rawPos) return;
+
+    // Convert pointer according to zoom scale & pan position
+    const pos = {
+      x: (rawPos.x - this.stage.x()) / this.stage.scaleX(),
+      y: (rawPos.y - this.stage.y()) / this.stage.scaleY()
+    };
+
+    // --- FEATURE 1: ERASER / OBJECT DELETION ---
+    if (this.activeTool === 'eraser') {
+      const clickedShape = e.target;
+      if (clickedShape && clickedShape !== this.stage && clickedShape.getLayer() === this.layer) {
+        clickedShape.destroy();
+        this.layer.batchDraw();
+        this.saveState();
+        this.setDirty(true);
+      }
+      this.isDrawing = true;
+      return;
+    }
 
     if (this.activeTool === 'fill') {
       this.floodFill(pos.x, pos.y, this.strokeColor);
@@ -139,9 +283,28 @@ export class BlueprintEngine {
   }
 
   handlePointerMove(e) {
-    if (!this.isDrawing || !this.currentShape) return;
-    const pos = this.stage.getPointerPosition();
-    if (!pos) return;
+    if (!this.isDrawing) return;
+
+    // Eraser drag support
+    if (this.activeTool === 'eraser') {
+      const clickedShape = e.target;
+      if (clickedShape && clickedShape !== this.stage && clickedShape.getLayer() === this.layer) {
+        clickedShape.destroy();
+        this.layer.batchDraw();
+        this.setDirty(true);
+      }
+      return;
+    }
+
+    if (!this.currentShape) return;
+
+    const rawPos = this.stage.getPointerPosition();
+    if (!rawPos) return;
+
+    const pos = {
+      x: (rawPos.x - this.stage.x()) / this.stage.scaleX(),
+      y: (rawPos.y - this.stage.y()) / this.stage.scaleY()
+    };
 
     if (this.activeTool === 'freehand') {
       const newPoints = this.currentShape.points().concat([pos.x, pos.y]);
@@ -356,6 +519,7 @@ export class BlueprintEngine {
     this.switchFloor(this.activeFloor);
     this.undoStack = [];
     this.redoStack = [];
+    this.resetZoom();
     this.setDirty(false);
   }
 }

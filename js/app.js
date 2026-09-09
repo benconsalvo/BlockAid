@@ -257,6 +257,9 @@ document.addEventListener('DOMContentLoaded', () => {
       engine.onDirtyChangeCallback = (isDirty) => {
         dirtyDot.style.display = isDirty ? 'inline' : 'none';
       };
+      engine.onZoomChangeCallback = (scale) => {
+        document.getElementById('zoom-level-text').textContent = `${Math.round(scale * 100)}%`;
+      };
       bindCanvasToolEvents();
     }
 
@@ -367,20 +370,78 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-bp-undo').addEventListener('click', () => engine.undo());
     document.getElementById('btn-bp-redo').addEventListener('click', () => engine.redo());
 
-    // DIRECT NATIVE COLOR PICKER TRIGGER
+    // --- CENTERED COLOR MODAL EVENT HANDLERS ---
     const colorBtn = document.getElementById('btn-color-picker');
-    const colorInput = document.getElementById('tool-color-input');
+    const colorModal = document.getElementById('color-modal');
+    const closeColorBtn = document.getElementById('btn-close-color-modal');
     const previewDot = document.getElementById('color-preview-dot');
+    const fullColorInput = document.getElementById('full-color-input');
+    const modalHexInput = document.getElementById('modal-hex-color-input');
+    const swatches = document.querySelectorAll('.color-swatch');
+
+    const updateColor = (colorHex) => {
+      engine.setColor(colorHex);
+      previewDot.style.backgroundColor = colorHex;
+      fullColorInput.value = colorHex;
+      modalHexInput.value = colorHex.toUpperCase();
+
+      swatches.forEach(s => {
+        if (s.dataset.color.toUpperCase() === colorHex.toUpperCase()) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+    };
 
     colorBtn.addEventListener('click', () => {
-      colorInput.click();
+      colorModal.style.display = 'flex';
     });
 
-    colorInput.addEventListener('input', (e) => {
-      const selectedColor = e.target.value;
-      engine.setColor(selectedColor);
-      previewDot.style.backgroundColor = selectedColor;
+    closeColorBtn.addEventListener('click', () => {
+      colorModal.style.display = 'none';
     });
+
+    colorModal.addEventListener('click', (e) => {
+      if (e.target === colorModal) {
+        colorModal.style.display = 'none';
+      }
+    });
+
+    swatches.forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        updateColor(swatch.dataset.color);
+      });
+    });
+
+    fullColorInput.addEventListener('input', (e) => {
+      updateColor(e.target.value);
+    });
+
+    modalHexInput.addEventListener('input', (e) => {
+      let val = e.target.value.trim();
+      if (!val.startsWith('#')) val = '#' + val;
+      if (/^#[0-9A-F]{6}$/i.test(val)) {
+        updateColor(val);
+      }
+    });
+
+    // --- POLISH FEATURE 2: GRID TOGGLE ---
+    const gridBtn = document.getElementById('btn-toggle-grid');
+    gridBtn.addEventListener('click', () => {
+      const isGridOn = engine.toggleGrid();
+      gridBtn.textContent = `📐 Grid: ${isGridOn ? 'ON' : 'OFF'}`;
+      if (isGridOn) {
+        gridBtn.classList.add('active');
+      } else {
+        gridBtn.classList.remove('active');
+      }
+    });
+
+    // --- POLISH FEATURE 3: ZOOM CONTROLS ---
+    document.getElementById('btn-zoom-in').addEventListener('click', () => engine.zoomIn());
+    document.getElementById('btn-zoom-out').addEventListener('click', () => engine.zoomOut());
+    document.getElementById('btn-zoom-reset').addEventListener('click', () => engine.resetZoom());
 
     // Keyboard Shortcuts for Undo (Ctrl+Z / Cmd+Z) and Redo (Ctrl+Y / Cmd+Y / Ctrl+Shift+Z)
     window.addEventListener('keydown', (e) => {
@@ -399,7 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    const tools = ['freehand', 'line', 'box', 'circle', 'fill'];
+    // Tools handling (including Feature 1: Eraser)
+    const tools = ['freehand', 'line', 'box', 'circle', 'fill', 'eraser'];
     tools.forEach(tool => {
       document.getElementById(`tool-${tool}`).addEventListener('click', (e) => {
         tools.forEach(t => document.getElementById(`tool-${t}`).classList.remove('active'));
