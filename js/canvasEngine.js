@@ -26,6 +26,8 @@ export class BlueprintEngine {
     this.stage = null;
     this.gridLayer = null;
     this.layer = null;
+    this.tokenLayer = null;
+    this.trailLayer = null;
     
     this.activeTool = 'freehand'; // 'freehand', 'line', 'box', 'circle', 'fill', 'eraser'
     this.strokeColor = '#1C1C1C';
@@ -35,6 +37,20 @@ export class BlueprintEngine {
     this.floorOrder = [1];
     this.showGrid = true;
 
+    // --- PHASE 4 RECORDING ENGINE STATE ---
+    this.performers = {}; // { id: { id, name, color, group, floor } }
+    this.recordedFrames = []; // Array of { timestamp, floor, performerData: { id: { x, y, floor } } }
+    this.notes = []; // Array of { timestamp, text, floor }
+    
+    this.isRecording = false;
+    this.isPlaying = false;
+    this.isPaused = false;
+    this.recStartTime = 0;
+    this.elapsedTime = 0;
+    this.recordingInterval = null;
+    this.playbackAnimFrame = null;
+    this.playbackStartTime = 0;
+
     this.undoStack = [];
     this.redoStack = [];
     this.isDirty = false;
@@ -43,8 +59,10 @@ export class BlueprintEngine {
 
     this.onDirtyChangeCallback = null;
     this.onZoomChangeCallback = null;
+    this.onTimerUpdateCallback = null;
+    this.onNoteTriggerCallback = null;
+    this.onPerformersChangeCallback = null;
 
-    // Right click & iPad 2-finger panning state
     this.isRightClickPanning = false;
     this.lastPanPointer = null;
     this.lastCenter = null;
@@ -62,13 +80,21 @@ export class BlueprintEngine {
       draggable: false
     });
 
-    // Create grid layer behind shapes
+    // 1. Grid layer (bottom)
     this.gridLayer = new Konva.Layer({ listening: false });
     this.stage.add(this.gridLayer);
 
-    // Create main drawing layer
+    // 2. Blueprint drawing layer
     this.layer = new Konva.Layer();
     this.stage.add(this.layer);
+
+    // 3. Movement path trails layer
+    this.trailLayer = new Konva.Layer({ listening: false });
+    this.stage.add(this.trailLayer);
+
+    // 4. Performer tokens layer (top)
+    this.tokenLayer = new Konva.Layer();
+    this.stage.add(this.tokenLayer);
 
     this.drawGrid();
     this.bindEvents();
@@ -82,7 +108,231 @@ export class BlueprintEngine {
     });
   }
 
-  // --- GRID LINES ---
+  // --- PERFORMER TOKEN MANAGEMENT ---
+  addPerformer(name, color) {
+    const id = `perf_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+    const startPos = {
+      x: (this.stage.width() / 2 - this.stage.x()) / this.stage.scaleX(),
+      y: (this.stage.height() / 2 - this.stage.y()) / this.stage.scaleY()
+    };
+
+    const group = new Konva.Group({
+      x: startPos.x,
+      y: startPos.y,
+      draggable: true,
+      id: id
+    });
+
+    const circle = new Konva.Circle({
+      radius: 18,
+      fill: color,
+      stroke: '#FFFFFF',
+      strokeWidth: 2,
+      shadowColor: '#000000',
+      shadowBlur: 6,
+      shadowOpacity: 0.4
+    });
+
+    const label = new Konva.Text({
+      text: name.substring(0, 3).toUpperCase(),
+      fontSize: 11,
+      fontStyle: 'bold',
+      fill: '#FFFFFF',
+      align: 'center'
+    });
+    label.offsetX(label.width() / 2);
+    label.offsetY(label.height() / 2);
+
+    group.add(circle);
+    group.add(label);
+
+    group.on('dragend', () => {
+      this.setDirty(true);
+    });
+
+    this.performers[id] = {
+      id: id,
+      name: name,
+      color: color,
+      group: group,
+      floor: this.activeFloor
+    };
+
+    this.tokenLayer.add(group);
+    this.tokenLayer.batchDraw();
+    this.setDirty(true);
+
+    if (this.onPerformersChangeCallback) {
+      this.onPerformersChangeCallback(this.performers);
+    }
+
+    return id;
+  }
+
+  // --- RECORDING LOGIC ---
+  startRecording() {
+    if (this.isPlaying) this.stopPlayback();
+
+    this.isRecording = true;
+    this.isPaused = false;
+    this.recStartTime = Date.now() - this.elapsedTime;
+    this.recordedFrames = [];
+
+    this.recordingInterval = setInterval(() => {
+      this.recordFrame();
+    }, 100); // Record position every 100ms
+  }
+
+  recordFrame() {
+    if (!this.isRecording || this.isPaused) return;
+
+    this.elapsedTime = Date.now() - this.recStartTime;
+    const performerData = {};
+
+    Object.keys(this.performers).forEach(id => {
+      const p = this.performers[id];
+      performerData[id] = {
+        x: p.group.x(),
+        y: p.group.y(),
+        floor: p.floor
+      };
+    });
+
+    this.recordedFrames.push({
+      timestamp: this.elapsedTime,
+      performerData: performerData
+    });
+
+    if (this.onTimerUpdateCallback) {
+      this.onTimerUpdateCallback(this.elapsedTime);
+    }
+  }
+
+  pauseRecording() {
+    this.isPaused = !this.isPaused;
+    if (!this.isPaused) {
+      this.recStartTime = Date.now() - this.elapsedTime;
+    }
+  }
+
+  stopRecording() {
+    this.isRecording = false;
+    this.isPaused = false;
+    clearInterval(this.recordingInterval);
+    this.setDirty(true);
+  }
+
+  addNote(text) {
+    if (!text || !text.trim()) return;
+    const time = this.elapsedTime;
+    this.notes.push({
+      timestamp: time,
+      text: text.trim(),
+      floor: this.activeFloor
+    });
+    this.setDirty(true);
+  }
+
+  // --- PLAYBACK LOGIC ---
+  startPlayback() {
+    if (this.recordedFrames.length === 0) return;
+    if (this.isRecording) this.stopRecording();
+
+    this.isPlaying = true;
+    this.isPaused = false;
+    this.playbackStartTime = Date.now();
+    this.drawPlaybackTrails();
+    this.playLoop();
+  }
+
+  playLoop() {
+    if (!this.isPlaying) return;
+
+    if (!this.isPaused) {
+      const currentRecTime = Date.now() - this.playbackStartTime;
+
+      if (this.onTimerUpdateCallback) {
+        this.onTimerUpdateCallback(currentRecTime);
+      }
+
+      // Check for Stage Notes trigger
+      const triggeredNote = this.notes.find(n => Math.abs(n.timestamp - currentRecTime) < 120);
+      if (triggeredNote && !triggeredNote.shown) {
+        triggeredNote.shown = true;
+        this.isPaused = true;
+        if (this.onNoteTriggerCallback) {
+          this.onNoteTriggerCallback(triggeredNote);
+        }
+      }
+
+      // Find closest recorded frame
+      const frame = this.recordedFrames.find(f => f.timestamp >= currentRecTime);
+      if (frame) {
+        Object.keys(frame.performerData).forEach(id => {
+          const data = frame.performerData[id];
+          const p = this.performers[id];
+          if (p) {
+            // Seamless Floor Level Switch during replay
+            if (data.floor !== this.activeFloor) {
+              this.switchFloor(data.floor);
+            }
+            p.group.position({ x: data.x, y: data.y });
+          }
+        });
+        this.tokenLayer.batchDraw();
+      } else {
+        // End of recording reach
+        this.stopPlayback();
+        return;
+      }
+    }
+
+    this.playbackAnimFrame = requestAnimationFrame(() => this.playLoop());
+  }
+
+  drawPlaybackTrails() {
+    this.trailLayer.destroyChildren();
+
+    Object.keys(this.performers).forEach(id => {
+      const p = this.performers[id];
+      const points = [];
+
+      this.recordedFrames.forEach(f => {
+        const data = f.performerData[id];
+        if (data && data.floor === this.activeFloor) {
+          points.push(data.x, data.y);
+        }
+      });
+
+      if (points.length > 2) {
+        const trail = new Konva.Line({
+          points: points,
+          stroke: p.color,
+          strokeWidth: 3,
+          opacity: 0.5,
+          dash: [6, 4]
+        });
+        this.trailLayer.add(trail);
+      }
+    });
+
+    this.trailLayer.batchDraw();
+  }
+
+  resumePlayback() {
+    this.isPaused = false;
+    this.playbackStartTime = Date.now() - this.elapsedTime;
+  }
+
+  stopPlayback() {
+    this.isPlaying = false;
+    this.isPaused = false;
+    cancelAnimationFrame(this.playbackAnimFrame);
+    this.trailLayer.destroyChildren();
+    this.trailLayer.batchDraw();
+  }
+
+  // --- GRID & CANVAS SETUP ---
   toggleGrid() {
     this.showGrid = !this.showGrid;
     this.drawGrid();
@@ -123,7 +373,6 @@ export class BlueprintEngine {
     this.gridLayer.batchDraw();
   }
 
-  // --- ZOOM & PAN CONTROLS ---
   zoomIn() {
     const oldScale = this.stage.scaleX();
     const newScale = Math.min(oldScale * 1.2, 5);
@@ -184,12 +433,8 @@ export class BlueprintEngine {
   }
 
   bindEvents() {
-    // Disable right-click context menu over canvas to allow smooth right-click drag panning
-    this.stage.on('contextmenu', (e) => {
-      e.evt.preventDefault();
-    });
+    this.stage.on('contextmenu', (e) => e.evt.preventDefault());
 
-    // Mouse wheel zoom support
     this.stage.on('wheel', (e) => {
       e.evt.preventDefault();
       const oldScale = this.stage.scaleX();
@@ -217,7 +462,6 @@ export class BlueprintEngine {
       if (this.onZoomChangeCallback) this.onZoomChangeCallback(clampedScale);
     });
 
-    // iPad 2-finger touch panning & pinching gesture handler
     this.stage.on('touchstart touchmove', (e) => {
       const touches = e.evt.touches;
       if (touches && touches.length === 2) {
@@ -283,7 +527,6 @@ export class BlueprintEngine {
   }
 
   handlePointerDown(e) {
-    // Check for Right Click Drag (Mouse Button 2) to Pan Canvas
     if (e.evt && e.evt.button === 2) {
       this.isRightClickPanning = true;
       this.lastPanPointer = { x: e.evt.clientX, y: e.evt.clientY };
@@ -294,7 +537,6 @@ export class BlueprintEngine {
     const rawPos = this.stage.getPointerPosition();
     if (!rawPos) return;
 
-    // Adjust coordinates for canvas pan & scale
     const pos = {
       x: (rawPos.x - this.stage.x()) / this.stage.scaleX(),
       y: (rawPos.y - this.stage.y()) / this.stage.scaleY()
@@ -307,7 +549,6 @@ export class BlueprintEngine {
 
     this.isDrawing = true;
 
-    // Natural Drag Eraser (destination-out cuts through existing strokes)
     if (this.activeTool === 'eraser') {
       this.currentShape = new Konva.Line({
         stroke: '#000000',
@@ -360,7 +601,6 @@ export class BlueprintEngine {
   }
 
   handlePointerMove(e) {
-    // Handle Right-click Pan Drag
     if (this.isRightClickPanning && e.evt) {
       const dx = e.evt.clientX - this.lastPanPointer.x;
       const dy = e.evt.clientY - this.lastPanPointer.y;
@@ -579,9 +819,16 @@ export class BlueprintEngine {
 
     return {
       id: blueprintId || `bp_${Date.now()}`,
-      name: blueprintName || 'Untitled Blueprint',
+      name: blueprintName || 'Untitled Stage Blocking',
       updatedAt: new Date().toISOString(),
-      floors: floorsArray
+      floors: floorsArray,
+      recordedFrames: this.recordedFrames,
+      notes: this.notes,
+      performers: Object.keys(this.performers).map(k => ({
+        id: this.performers[k].id,
+        name: this.performers[k].name,
+        color: this.performers[k].color
+      }))
     };
   }
 
@@ -589,6 +836,9 @@ export class BlueprintEngine {
     this.floorsData = {};
     this.floorNames = {};
     this.floorOrder = [];
+    this.tokenLayer.destroyChildren();
+    this.performers = {};
+
     if (blueprintData.floors && blueprintData.floors.length > 0) {
       blueprintData.floors.forEach(f => {
         this.floorsData[f.level] = f.layerData;
@@ -600,6 +850,16 @@ export class BlueprintEngine {
       this.floorNames[1] = 'Level 1';
       this.floorOrder = [1];
     }
+
+    if (blueprintData.performers) {
+      blueprintData.performers.forEach(p => {
+        this.addPerformer(p.name, p.color);
+      });
+    }
+
+    this.recordedFrames = blueprintData.recordedFrames || [];
+    this.notes = blueprintData.notes || [];
+
     this.activeFloor = this.floorOrder[0] || 1;
     this.switchFloor(this.activeFloor);
     this.undoStack = [];

@@ -76,11 +76,20 @@ const customAlert = (msg, title = 'Notice') => showCustomDialog({ title, message
 const customConfirm = (msg, title = 'Confirm Action') => showCustomDialog({ title, message: msg, showCancel: true });
 const customPrompt = (msg, defaultVal = '', title = 'Input Required') => showCustomDialog({ title, message: msg, showInput: true, defaultValue: defaultVal, showCancel: true });
 
+function formatTime(ms) {
+  const totalSeconds = ms / 1000;
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = Math.floor(totalSeconds % 60);
+  const tenths = Math.floor((ms % 1000) / 100);
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${tenths}`;
+}
+
 // --- MAIN APPLICATION LOGIC ---
 document.addEventListener('DOMContentLoaded', () => {
   let engine = null;
   let currentBlueprintId = null;
   let currentBlueprintName = '';
+  let activeMode = 'blueprint'; // 'blueprint' or 'recording'
   let draggedIndex = null;
 
   const viewMainMenu = document.getElementById('view-main-menu');
@@ -177,7 +186,11 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       document.querySelectorAll('.btn-edit-bp').forEach(btn => {
-        btn.addEventListener('click', (e) => openBlueprintCanvas(e.target.dataset.path));
+        btn.addEventListener('click', (e) => openBlueprintCanvas(e.target.dataset.path, 'blueprint'));
+      });
+
+      document.querySelectorAll('.btn-create-blocking').forEach(btn => {
+        btn.addEventListener('click', (e) => openBlueprintCanvas(e.target.dataset.path, 'recording'));
       });
 
       document.querySelectorAll('.btn-delete-bp').forEach(btn => {
@@ -219,6 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
         recordingsList.appendChild(li);
       });
 
+      document.querySelectorAll('.btn-edit-rec').forEach(btn => {
+        btn.addEventListener('click', (e) => openBlueprintCanvas(e.target.dataset.path, 'recording'));
+      });
+
       document.querySelectorAll('.btn-delete-rec').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const path = e.target.dataset.path;
@@ -236,7 +253,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- CANVAS LAUNCH & BINDINGS ---
-  async function openBlueprintCanvas(filePath = null) {
+  async function openBlueprintCanvas(filePath = null, mode = 'blueprint') {
+    activeMode = mode;
+    
     if (filePath) {
       const fileData = await fetchFileContent(filePath);
       currentBlueprintId = fileData.content.id;
@@ -251,15 +270,48 @@ document.addEventListener('DOMContentLoaded', () => {
     viewMainMenu.style.display = 'none';
     viewBlueprintCanvas.style.display = 'flex';
 
+    // Toggle Ribbons according to Blueprint vs Recording mode
+    const bpTools = document.getElementById('blueprint-tools-group');
+    const recTools = document.getElementById('recording-tools-group');
+    const rightPanel = document.getElementById('right-performers-panel');
+
+    if (mode === 'recording') {
+      bpTools.style.display = 'none';
+      recTools.style.display = 'flex';
+      rightPanel.style.display = 'flex';
+    } else {
+      bpTools.style.display = 'flex';
+      recTools.style.display = 'none';
+      rightPanel.style.display = 'none';
+    }
+
     if (!engine) {
       engine = new BlueprintEngine('konva-holder');
       engine.init();
+      
       engine.onDirtyChangeCallback = (isDirty) => {
         dirtyDot.style.display = isDirty ? 'inline' : 'none';
       };
+      
       engine.onZoomChangeCallback = (scale) => {
         document.getElementById('zoom-level-text').textContent = `${Math.round(scale * 100)}%`;
       };
+
+      engine.onTimerUpdateCallback = (ms) => {
+        document.getElementById('recording-timer').textContent = formatTime(ms);
+      };
+
+      engine.onPerformersChangeCallback = () => {
+        renderPerformersList();
+      };
+
+      engine.onNoteTriggerCallback = (note) => {
+        const banner = document.getElementById('stage-notes-banner');
+        const textEl = document.getElementById('stage-notes-text');
+        textEl.textContent = `📝 Note [${formatTime(note.timestamp)}]: ${note.text}`;
+        banner.style.display = 'flex';
+      };
+
       bindCanvasToolEvents();
     }
 
@@ -271,6 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     renderFloorButtons();
+    renderPerformersList();
+    renderNotesList();
   }
 
   function renderFloorButtons() {
@@ -353,6 +407,52 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function renderPerformersList() {
+    const listEl = document.getElementById('performers-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+
+    const keys = Object.keys(engine.performers);
+    if (keys.length === 0) {
+      listEl.innerHTML = '<span class="empty-message">No performers added.</span>';
+      return;
+    }
+
+    keys.forEach(k => {
+      const p = engine.performers[k];
+      const row = document.createElement('div');
+      row.className = 'performer-row';
+      row.innerHTML = `
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span class="performer-badge" style="background-color: ${p.color};"></span>
+          <span>${p.name}</span>
+        </div>
+      `;
+      listEl.appendChild(row);
+    });
+  }
+
+  function renderNotesList() {
+    const listEl = document.getElementById('notes-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+
+    if (engine.notes.length === 0) {
+      listEl.innerHTML = '<span class="empty-message">No notes in this take.</span>';
+      return;
+    }
+
+    engine.notes.forEach(n => {
+      const row = document.createElement('div');
+      row.className = 'note-item-row';
+      row.innerHTML = `
+        <span class="note-time-tag">${formatTime(n.timestamp)}</span>
+        <span>${n.text}</span>
+      `;
+      listEl.appendChild(row);
+    });
+  }
+
   function bindCanvasToolEvents() {
     document.getElementById('btn-bp-main-menu').addEventListener('click', async () => {
       if (engine.isDirty) {
@@ -361,6 +461,8 @@ document.addEventListener('DOMContentLoaded', () => {
           await saveBlueprintData();
         }
       }
+      engine.stopPlayback();
+      engine.stopRecording();
       viewBlueprintCanvas.style.display = 'none';
       viewMainMenu.style.display = 'block';
       loadData();
@@ -370,7 +472,62 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-bp-undo').addEventListener('click', () => engine.undo());
     document.getElementById('btn-bp-redo').addEventListener('click', () => engine.redo());
 
-    // --- CENTERED COLOR MODAL EVENT HANDLERS ---
+    // --- PHASE 4 RECORDING & PERFORMER CONTROLS ---
+    const recStartBtn = document.getElementById('btn-rec-start');
+    const recPauseBtn = document.getElementById('btn-rec-pause');
+    const recPlayBtn = document.getElementById('btn-rec-play');
+
+    document.getElementById('btn-add-performer').addEventListener('click', async () => {
+      const name = await customPrompt('Performer Name or Role:', 'Actor 1', 'Add Performer');
+      if (!name) return;
+      const palette = ['#D9534F', '#4A90E2', '#51CF66', '#F5A623', '#9013FE', '#D4AF37'];
+      const randomColor = palette[Math.floor(Math.random() * palette.length)];
+      engine.addPerformer(name, randomColor);
+    });
+
+    recStartBtn.addEventListener('click', () => {
+      if (!engine.isRecording) {
+        engine.startRecording();
+        recStartBtn.classList.add('recording');
+        recStartBtn.textContent = '⏹ Stop Rec';
+        recPauseBtn.style.display = 'inline-block';
+      } else {
+        engine.stopRecording();
+        recStartBtn.classList.remove('recording');
+        recStartBtn.textContent = '🔴 Record';
+        recPauseBtn.style.display = 'none';
+      }
+    });
+
+    recPauseBtn.addEventListener('click', () => {
+      engine.pauseRecording();
+      recPauseBtn.textContent = engine.isPaused ? '▶ Resume' : '⏸ Pause';
+    });
+
+    recPlayBtn.addEventListener('click', () => {
+      if (!engine.isPlaying) {
+        engine.startPlayback();
+        recPlayBtn.textContent = '⏹ Stop Play';
+      } else {
+        engine.stopPlayback();
+        recPlayBtn.textContent = '▶ Play';
+      }
+    });
+
+    document.getElementById('btn-add-note').addEventListener('click', async () => {
+      const noteText = await customPrompt('Enter Stage Director Note:', '', 'Add Stage Note');
+      if (noteText) {
+        engine.addNote(noteText);
+        renderNotesList();
+      }
+    });
+
+    document.getElementById('btn-dismiss-note').addEventListener('click', () => {
+      document.getElementById('stage-notes-banner').style.display = 'none';
+      engine.resumePlayback();
+    });
+
+    // --- COLOR MODAL EVENT HANDLERS ---
     const colorBtn = document.getElementById('btn-color-picker');
     const colorModal = document.getElementById('color-modal');
     const closeColorBtn = document.getElementById('btn-close-color-modal');
@@ -426,7 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // --- GRID TOGGLE ---
+    // --- GRID & ZOOM CONTROLS ---
     const gridBtn = document.getElementById('btn-toggle-grid');
     gridBtn.addEventListener('click', () => {
       const isGridOn = engine.toggleGrid();
@@ -438,12 +595,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // --- ZOOM CONTROLS ---
     document.getElementById('btn-zoom-in').addEventListener('click', () => engine.zoomIn());
     document.getElementById('btn-zoom-out').addEventListener('click', () => engine.zoomOut());
     document.getElementById('btn-zoom-reset').addEventListener('click', () => engine.resetZoom());
 
-    // Keyboard Shortcuts for Undo (Ctrl+Z / Cmd+Z) and Redo (Ctrl+Y / Cmd+Y / Ctrl+Shift+Z)
+    // Shortcuts
     window.addEventListener('keydown', (e) => {
       if (viewBlueprintCanvas.style.display === 'none') return;
 
@@ -460,7 +616,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Drawing Tools handling
     const tools = ['freehand', 'line', 'box', 'circle', 'fill', 'eraser'];
     tools.forEach(tool => {
       document.getElementById(`tool-${tool}`).addEventListener('click', (e) => {
@@ -478,12 +633,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function saveBlueprintData() {
     const exportData = engine.exportJSON(currentBlueprintId, currentBlueprintName);
+    const targetFolder = activeMode === 'recording' ? 'Recordings' : 'Blueprints';
     const fileName = `${currentBlueprintName.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`;
     
     try {
-      await saveFileToRepository('Blueprints', fileName, exportData, `Save blueprint ${currentBlueprintName}`);
+      await saveFileToRepository(targetFolder, fileName, exportData, `Save ${targetFolder} ${currentBlueprintName}`);
       engine.setDirty(false);
-      await customAlert('Blueprint saved successfully!', 'Success');
+      await customAlert(`${activeMode === 'recording' ? 'Stage blocking' : 'Blueprint'} saved successfully!`, 'Success');
     } catch (err) {
       await customAlert(`Save failed: ${err.message}`, 'Error');
     }

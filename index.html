@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <!-- EDITING BLUEPRINT CANVAS VIEW -->
+  <!-- EDITING BLUEPRINT / BLOCKING CANVAS VIEW -->
   <div id="view-blueprint-canvas" class="canvas-screen-container" style="display: none;">
     
     <!-- Top Ribbon -->
@@ -56,22 +56,33 @@
         <button id="btn-bp-redo" class="btn-icon" title="Redo (Ctrl+Y)">↪ Redo</button>
       </div>
 
-      <!-- Center Drawing Tools -->
+      <!-- Center Drawing & Recording Tools -->
       <div class="ribbon-group-center">
-        <button id="tool-freehand" class="btn-tool active">✏ Freehand</button>
-        <button id="tool-line" class="btn-tool">📏 Line</button>
-        <button id="tool-box" class="btn-tool">🔲 Box</button>
-        <button id="tool-circle" class="btn-tool">⭕ Circle</button>
-        <button id="tool-fill" class="btn-tool">🪣 Fill</button>
-        <button id="tool-eraser" class="btn-tool">🧽 Eraser</button>
-        
-        <!-- Pen Color Trigger Button -->
-        <button id="btn-color-picker" class="btn-tool color-picker-btn" title="Change Pen Color">
-          🎨 Color <span id="color-preview-dot" class="color-preview-dot"></span>
-        </button>
+        <!-- Blueprint Drawing Tools -->
+        <div id="blueprint-tools-group" class="tools-subgroup">
+          <button id="tool-freehand" class="btn-tool active">✏ Freehand</button>
+          <button id="tool-line" class="btn-tool">📏 Line</button>
+          <button id="tool-box" class="btn-tool">🔲 Box</button>
+          <button id="tool-circle" class="btn-tool">⭕ Circle</button>
+          <button id="tool-fill" class="btn-tool">🪣 Fill</button>
+          <button id="tool-eraser" class="btn-tool">🧽 Eraser</button>
+          
+          <button id="btn-color-picker" class="btn-tool color-picker-btn" title="Change Pen Color">
+            🎨 Color <span id="color-preview-dot" class="color-preview-dot"></span>
+          </button>
 
-        <!-- Grid Toggle -->
-        <button id="btn-toggle-grid" class="btn-tool active" title="Toggle Grid Lines">📐 Grid: ON</button>
+          <button id="btn-toggle-grid" class="btn-tool active" title="Toggle Grid Lines">📐 Grid: ON</button>
+        </div>
+
+        <!-- Phase 4 Recording Controls Ribbon -->
+        <div id="recording-tools-group" class="tools-subgroup">
+          <button id="btn-add-performer" class="btn-tool">👤 + Person</button>
+          <button id="btn-rec-start" class="btn-tool btn-rec">🔴 Record</button>
+          <button id="btn-rec-pause" class="btn-tool" style="display: none;">⏸ Pause</button>
+          <button id="btn-rec-play" class="btn-tool btn-play">▶ Play</button>
+          <button id="btn-add-note" class="btn-tool">📝 + Note</button>
+          <span id="recording-timer" class="rec-timer-display">00:00.0</span>
+        </div>
       </div>
 
       <!-- Right Zoom Controls -->
@@ -93,7 +104,29 @@
       </div>
 
       <!-- Interactive Canvas Container -->
-      <div id="konva-holder" class="konva-holder"></div>
+      <div id="konva-holder" class="konva-holder">
+        <!-- Stage Notes Display Banner -->
+        <div id="stage-notes-banner" class="stage-notes-banner" style="display: none;">
+          <span id="stage-notes-text">Note goes here...</span>
+          <button id="btn-dismiss-note" class="btn-secondary btn-sm">Resume</button>
+        </div>
+      </div>
+
+      <!-- Right Performers & Notes Panel -->
+      <div id="right-performers-panel" class="right-performers-panel">
+        <div class="panel-section">
+          <span class="panel-title">Performers</span>
+          <div id="performers-list" class="performers-list">
+            <span class="empty-message">No performers added.</span>
+          </div>
+        </div>
+        <div class="panel-section">
+          <span class="panel-title">Take Notes</span>
+          <div id="notes-list" class="notes-list">
+            <span class="empty-message">No notes in this take.</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Bottom Stage Direction Bar -->
@@ -102,12 +135,11 @@
     </div>
   </div>
 
-  <!-- CENTERED HTML PEN COLOR MODAL -->
+  <!-- CENTERED PEN COLOR MODAL -->
   <div id="color-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content dialog-card" style="max-width: 320px;">
       <h3 class="dialog-title" style="text-align: center; margin-bottom: 16px;">Select Pen Color</h3>
       
-      <!-- Preset Color Swatches -->
       <div class="color-swatches-title">Phoenix & Classic Palette</div>
       <div class="color-swatches-grid">
         <button class="color-swatch active" data-color="#1C1C1C" style="background-color: #1C1C1C;" title="Dark Charcoal"></button>
@@ -122,13 +154,11 @@
         <button class="color-swatch" data-color="#000000" style="background-color: #000000;" title="Pure Black"></button>
       </div>
 
-      <!-- Color Wheel / Custom Input Box -->
       <div class="color-picker-main-row" style="margin-top: 16px;">
         <label for="full-color-input" class="full-color-label">Custom Color Wheel:</label>
         <input type="color" id="full-color-input" value="#1C1C1C" class="full-color-input">
       </div>
 
-      <!-- HEX Input -->
       <div class="hex-input-row">
         <label for="modal-hex-color-input">HEX Code:</label>
         <input type="text" id="modal-hex-color-input" value="#1C1C1C" maxlength="7" placeholder="#1C1C1C">
