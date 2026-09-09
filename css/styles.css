@@ -356,7 +356,7 @@ body {
   z-index: 500;
 }
 
-/* TOP CONTROL RIBBON */
+/* TOP CONTROL RIBBON (Stacking fix) */
 .top-ribbon {
   height: 60px;
   background-color: var(--color-card);
@@ -366,6 +366,8 @@ body {
   align-items: center;
   padding: 0 16px;
   gap: 16px;
+  position: relative;
+  z-index: 100;
 }
 
 .ribbon-group-left {
@@ -411,6 +413,7 @@ body {
   cursor: pointer;
   font-size: 13px;
   white-space: nowrap;
+  pointer-events: auto;
 }
 
 .btn-tool.active {
@@ -475,6 +478,7 @@ body {
   display: flex;
   position: relative;
   overflow: hidden;
+  z-index: 1;
 }
 
 /* LEFT FLOOR RIBBON */
@@ -487,6 +491,7 @@ body {
   padding: 12px 8px;
   gap: 8px;
   overflow-y: auto;
+  z-index: 10;
 }
 
 .floor-title {
@@ -619,6 +624,7 @@ body {
   padding: 12px 8px;
   gap: 16px;
   overflow-y: auto;
+  z-index: 10;
 }
 
 .panel-section {
@@ -689,4 +695,6 @@ body {
   font-weight: bold;
   letter-spacing: 4px;
   font-size: 14px;
+  position: relative;
+  z-index: 100;
 }

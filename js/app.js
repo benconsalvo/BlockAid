@@ -186,16 +186,16 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       document.querySelectorAll('.btn-edit-bp').forEach(btn => {
-        btn.addEventListener('click', (e) => openBlueprintCanvas(e.target.dataset.path, 'blueprint'));
+        btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'blueprint'));
       });
 
       document.querySelectorAll('.btn-create-blocking').forEach(btn => {
-        btn.addEventListener('click', (e) => openBlueprintCanvas(e.target.dataset.path, 'recording'));
+        btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'recording'));
       });
 
       document.querySelectorAll('.btn-delete-bp').forEach(btn => {
         btn.addEventListener('click', async (e) => {
-          const path = e.target.dataset.path;
+          const path = e.currentTarget.dataset.path;
           const confirmed = await customConfirm(`Are you sure you want to delete ${path.replace('Blueprints/', '')}?`, 'Delete Blueprint');
           if (confirmed) {
             await deleteFileFromRepository(path);
@@ -233,12 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       document.querySelectorAll('.btn-edit-rec').forEach(btn => {
-        btn.addEventListener('click', (e) => openBlueprintCanvas(e.target.dataset.path, 'recording'));
+        btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'recording'));
       });
 
       document.querySelectorAll('.btn-delete-rec').forEach(btn => {
         btn.addEventListener('click', async (e) => {
-          const path = e.target.dataset.path;
+          const path = e.currentTarget.dataset.path;
           const confirmed = await customConfirm(`Are you sure you want to delete ${path.replace('Recordings/', '')}?`, 'Delete Blocking');
           if (confirmed) {
             await deleteFileFromRepository(path);
@@ -276,13 +276,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const rightPanel = document.getElementById('right-performers-panel');
 
     if (mode === 'recording') {
-      bpTools.style.display = 'none';
-      recTools.style.display = 'flex';
-      rightPanel.style.display = 'flex';
+      if (bpTools) bpTools.style.display = 'none';
+      if (recTools) recTools.style.display = 'flex';
+      if (rightPanel) rightPanel.style.display = 'flex';
     } else {
-      bpTools.style.display = 'flex';
-      recTools.style.display = 'none';
-      rightPanel.style.display = 'none';
+      if (bpTools) bpTools.style.display = 'flex';
+      if (recTools) recTools.style.display = 'none';
+      if (rightPanel) rightPanel.style.display = 'none';
     }
 
     if (!engine) {
@@ -294,11 +294,13 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       
       engine.onZoomChangeCallback = (scale) => {
-        document.getElementById('zoom-level-text').textContent = `${Math.round(scale * 100)}%`;
+        const zoomText = document.getElementById('zoom-level-text');
+        if (zoomText) zoomText.textContent = `${Math.round(scale * 100)}%`;
       };
 
       engine.onTimerUpdateCallback = (ms) => {
-        document.getElementById('recording-timer').textContent = formatTime(ms);
+        const timer = document.getElementById('recording-timer');
+        if (timer) timer.textContent = formatTime(ms);
       };
 
       engine.onPerformersChangeCallback = () => {
@@ -308,8 +310,10 @@ document.addEventListener('DOMContentLoaded', () => {
       engine.onNoteTriggerCallback = (note) => {
         const banner = document.getElementById('stage-notes-banner');
         const textEl = document.getElementById('stage-notes-text');
-        textEl.textContent = `📝 Note [${formatTime(note.timestamp)}]: ${note.text}`;
-        banner.style.display = 'flex';
+        if (banner && textEl) {
+          textEl.textContent = `📝 Note [${formatTime(note.timestamp)}]: ${note.text}`;
+          banner.style.display = 'flex';
+        }
       };
 
       bindCanvasToolEvents();
@@ -329,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderFloorButtons() {
     const floorsList = document.getElementById('floors-list');
+    if (!floorsList) return;
     floorsList.innerHTML = '';
     
     engine.floorOrder.forEach((floorNum, index) => {
@@ -454,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function bindCanvasToolEvents() {
-    document.getElementById('btn-bp-main-menu').addEventListener('click', async () => {
+    document.getElementById('btn-bp-main-menu')?.addEventListener('click', async () => {
       if (engine.isDirty) {
         const shouldSave = await customConfirm('You have unsaved changes. Would you like to save before leaving?', 'Unsaved Changes');
         if (shouldSave) {
@@ -468,16 +473,16 @@ document.addEventListener('DOMContentLoaded', () => {
       loadData();
     });
 
-    document.getElementById('btn-bp-save').addEventListener('click', saveBlueprintData);
-    document.getElementById('btn-bp-undo').addEventListener('click', () => engine.undo());
-    document.getElementById('btn-bp-redo').addEventListener('click', () => engine.redo());
+    document.getElementById('btn-bp-save')?.addEventListener('click', saveBlueprintData);
+    document.getElementById('btn-bp-undo')?.addEventListener('click', () => engine.undo());
+    document.getElementById('btn-bp-redo')?.addEventListener('click', () => engine.redo());
 
     // --- PHASE 4 RECORDING & PERFORMER CONTROLS ---
     const recStartBtn = document.getElementById('btn-rec-start');
     const recPauseBtn = document.getElementById('btn-rec-pause');
     const recPlayBtn = document.getElementById('btn-rec-play');
 
-    document.getElementById('btn-add-performer').addEventListener('click', async () => {
+    document.getElementById('btn-add-performer')?.addEventListener('click', async () => {
       const name = await customPrompt('Performer Name or Role:', 'Actor 1', 'Add Performer');
       if (!name) return;
       const palette = ['#D9534F', '#4A90E2', '#51CF66', '#F5A623', '#9013FE', '#D4AF37'];
@@ -485,26 +490,26 @@ document.addEventListener('DOMContentLoaded', () => {
       engine.addPerformer(name, randomColor);
     });
 
-    recStartBtn.addEventListener('click', () => {
+    recStartBtn?.addEventListener('click', () => {
       if (!engine.isRecording) {
         engine.startRecording();
         recStartBtn.classList.add('recording');
         recStartBtn.textContent = '⏹ Stop Rec';
-        recPauseBtn.style.display = 'inline-block';
+        if (recPauseBtn) recPauseBtn.style.display = 'inline-block';
       } else {
         engine.stopRecording();
         recStartBtn.classList.remove('recording');
         recStartBtn.textContent = '🔴 Record';
-        recPauseBtn.style.display = 'none';
+        if (recPauseBtn) recPauseBtn.style.display = 'none';
       }
     });
 
-    recPauseBtn.addEventListener('click', () => {
+    recPauseBtn?.addEventListener('click', () => {
       engine.pauseRecording();
       recPauseBtn.textContent = engine.isPaused ? '▶ Resume' : '⏸ Pause';
     });
 
-    recPlayBtn.addEventListener('click', () => {
+    recPlayBtn?.addEventListener('click', () => {
       if (!engine.isPlaying) {
         engine.startPlayback();
         recPlayBtn.textContent = '⏹ Stop Play';
@@ -514,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    document.getElementById('btn-add-note').addEventListener('click', async () => {
+    document.getElementById('btn-add-note')?.addEventListener('click', async () => {
       const noteText = await customPrompt('Enter Stage Director Note:', '', 'Add Stage Note');
       if (noteText) {
         engine.addNote(noteText);
@@ -522,8 +527,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    document.getElementById('btn-dismiss-note').addEventListener('click', () => {
-      document.getElementById('stage-notes-banner').style.display = 'none';
+    document.getElementById('btn-dismiss-note')?.addEventListener('click', () => {
+      const banner = document.getElementById('stage-notes-banner');
+      if (banner) banner.style.display = 'none';
       engine.resumePlayback();
     });
 
@@ -538,9 +544,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateColor = (colorHex) => {
       engine.setColor(colorHex);
-      previewDot.style.backgroundColor = colorHex;
-      fullColorInput.value = colorHex;
-      modalHexInput.value = colorHex.toUpperCase();
+      if (previewDot) previewDot.style.backgroundColor = colorHex;
+      if (fullColorInput) fullColorInput.value = colorHex;
+      if (modalHexInput) modalHexInput.value = colorHex.toUpperCase();
 
       swatches.forEach(s => {
         if (s.dataset.color.toUpperCase() === colorHex.toUpperCase()) {
@@ -551,31 +557,31 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     };
 
-    colorBtn.addEventListener('click', () => {
-      colorModal.style.display = 'flex';
+    colorBtn?.addEventListener('click', () => {
+      if (colorModal) colorModal.style.display = 'flex';
     });
 
-    closeColorBtn.addEventListener('click', () => {
-      colorModal.style.display = 'none';
+    closeColorBtn?.addEventListener('click', () => {
+      if (colorModal) colorModal.style.display = 'none';
     });
 
-    colorModal.addEventListener('click', (e) => {
+    colorModal?.addEventListener('click', (e) => {
       if (e.target === colorModal) {
         colorModal.style.display = 'none';
       }
     });
 
     swatches.forEach(swatch => {
-      swatch.addEventListener('click', () => {
-        updateColor(swatch.dataset.color);
+      swatch.addEventListener('click', (e) => {
+        updateColor(e.currentTarget.dataset.color);
       });
     });
 
-    fullColorInput.addEventListener('input', (e) => {
+    fullColorInput?.addEventListener('input', (e) => {
       updateColor(e.target.value);
     });
 
-    modalHexInput.addEventListener('input', (e) => {
+    modalHexInput?.addEventListener('input', (e) => {
       let val = e.target.value.trim();
       if (!val.startsWith('#')) val = '#' + val;
       if (/^#[0-9A-F]{6}$/i.test(val)) {
@@ -585,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GRID & ZOOM CONTROLS ---
     const gridBtn = document.getElementById('btn-toggle-grid');
-    gridBtn.addEventListener('click', () => {
+    gridBtn?.addEventListener('click', () => {
       const isGridOn = engine.toggleGrid();
       gridBtn.textContent = `📐 Grid: ${isGridOn ? 'ON' : 'OFF'}`;
       if (isGridOn) {
@@ -595,9 +601,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    document.getElementById('btn-zoom-in').addEventListener('click', () => engine.zoomIn());
-    document.getElementById('btn-zoom-out').addEventListener('click', () => engine.zoomOut());
-    document.getElementById('btn-zoom-reset').addEventListener('click', () => engine.resetZoom());
+    document.getElementById('btn-zoom-in')?.addEventListener('click', () => engine.zoomIn());
+    document.getElementById('btn-zoom-out')?.addEventListener('click', () => engine.zoomOut());
+    document.getElementById('btn-zoom-reset')?.addEventListener('click', () => engine.resetZoom());
 
     // Shortcuts
     window.addEventListener('keydown', (e) => {
@@ -616,16 +622,23 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Drawing Tools handling
     const tools = ['freehand', 'line', 'box', 'circle', 'fill', 'eraser'];
     tools.forEach(tool => {
-      document.getElementById(`tool-${tool}`).addEventListener('click', (e) => {
-        tools.forEach(t => document.getElementById(`tool-${t}`).classList.remove('active'));
-        e.target.classList.add('active');
-        engine.setTool(tool);
-      });
+      const btn = document.getElementById(`tool-${tool}`);
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          tools.forEach(t => {
+            const b = document.getElementById(`tool-${t}`);
+            if (b) b.classList.remove('active');
+          });
+          e.currentTarget.classList.add('active');
+          engine.setTool(tool);
+        });
+      }
     });
 
-    document.getElementById('btn-add-floor').addEventListener('click', () => {
+    document.getElementById('btn-add-floor')?.addEventListener('click', () => {
       engine.addFloor();
       renderFloorButtons();
     });
