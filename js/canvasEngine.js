@@ -27,7 +27,7 @@ export class BlueprintEngine {
     this.gridLayer = null;
     this.layer = null;
     
-    this.activeTool = 'freehand'; // 'freehand', 'line', 'box', 'circle', 'fill', 'eraser'
+    this.activeTool = 'freehand'; // 'cursor', 'freehand', 'line', 'box', 'circle', 'fill', 'eraser'
     this.strokeColor = '#1C1C1C';
     this.activeFloor = 1;
     this.floorsData = { 1: null };
@@ -43,6 +43,10 @@ export class BlueprintEngine {
 
     this.onDirtyChangeCallback = null;
     this.onZoomChangeCallback = null;
+
+    // iPad 2-finger Pan/Zoom state
+    this.lastCenter = null;
+    this.lastDist = 0;
   }
 
   init() {
@@ -76,7 +80,7 @@ export class BlueprintEngine {
     });
   }
 
-  // --- FEATURE 2: GRID LINES ---
+  // --- GRID LINES ---
   toggleGrid() {
     this.showGrid = !this.showGrid;
     this.drawGrid();
@@ -117,7 +121,7 @@ export class BlueprintEngine {
     this.gridLayer.batchDraw();
   }
 
-  // --- FEATURE 3: ZOOM & PAN ---
+  // --- ZOOM & PAN CONTROLS ---
   zoomIn() {
     const oldScale = this.stage.scaleX();
     const newScale = Math.min(oldScale * 1.2, 5);
@@ -170,7 +174,13 @@ export class BlueprintEngine {
 
   setTool(tool) {
     this.activeTool = tool;
-    this.container.style.cursor = tool === 'eraser' ? 'pointer' : 'crosshair';
+    if (tool === 'cursor') {
+      this.stage.draggable(true);
+      this.container.style.cursor = 'grab';
+    } else {
+      this.stage.draggable(false);
+      this.container.style.cursor = tool === 'eraser' ? 'crosshair' : 'crosshair';
+    }
   }
 
   setColor(color) {
@@ -206,33 +216,83 @@ export class BlueprintEngine {
       if (this.onZoomChangeCallback) this.onZoomChangeCallback(clampedScale);
     });
 
+    // iPad 2-finger touch panning & pinching gesture handler
+    this.stage.on('touchstart touchmove', (e) => {
+      const touches = e.evt.touches;
+      if (touches && touches.length === 2) {
+        // Cancel active drawing line if second finger touches screen
+        if (this.isDrawing) {
+          this.isDrawing = false;
+          if (this.currentShape) {
+            this.currentShape.destroy();
+            this.currentShape = null;
+            this.layer.batchDraw();
+          }
+        }
+
+        const p1 = { x: touches[0].clientX, y: touches[0].clientY };
+        const p2 = { x: touches[1].clientX, y: touches[1].clientY };
+
+        if (!this.lastCenter) {
+          this.lastCenter = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+          this.lastDist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+          return;
+        }
+
+        const newCenter = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+        const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+
+        const dx = newCenter.x - this.lastCenter.x;
+        const dy = newCenter.y - this.lastCenter.y;
+
+        const pointTo = {
+          x: (newCenter.x - this.stage.x()) / this.stage.scaleX(),
+          y: (newCenter.y - this.stage.y()) / this.stage.scaleY()
+        };
+
+        let scale = this.stage.scaleX() * (dist / this.lastDist);
+        scale = Math.max(0.3, Math.min(5, scale));
+
+        this.stage.scale({ x: scale, y: scale });
+
+        const newPos = {
+          x: newCenter.x - pointTo.x * scale + dx,
+          y: newCenter.y - pointTo.y * scale + dy
+        };
+
+        this.stage.position(newPos);
+        this.stage.batchDraw();
+
+        this.lastCenter = newCenter;
+        this.lastDist = dist;
+
+        if (this.onZoomChangeCallback) this.onZoomChangeCallback(scale);
+      }
+    });
+
+    this.stage.on('touchend', (e) => {
+      if (!e.evt.touches || e.evt.touches.length < 2) {
+        this.lastCenter = null;
+        this.lastDist = 0;
+      }
+    });
+
     this.stage.on('mousedown touchstart', (e) => this.handlePointerDown(e));
     this.stage.on('mousemove touchmove', (e) => this.handlePointerMove(e));
     this.stage.on('mouseup touchend', () => this.handlePointerUp());
   }
 
   handlePointerDown(e) {
+    if (this.activeTool === 'cursor') return; // Canvas movement handled by Konva stage drag
+
     const rawPos = this.stage.getPointerPosition();
     if (!rawPos) return;
 
-    // Convert pointer according to zoom scale & pan position
+    // Adjust coordinates for canvas pan & scale
     const pos = {
       x: (rawPos.x - this.stage.x()) / this.stage.scaleX(),
       y: (rawPos.y - this.stage.y()) / this.stage.scaleY()
     };
-
-    // --- FEATURE 1: ERASER / OBJECT DELETION ---
-    if (this.activeTool === 'eraser') {
-      const clickedShape = e.target;
-      if (clickedShape && clickedShape !== this.stage && clickedShape.getLayer() === this.layer) {
-        clickedShape.destroy();
-        this.layer.batchDraw();
-        this.saveState();
-        this.setDirty(true);
-      }
-      this.isDrawing = true;
-      return;
-    }
 
     if (this.activeTool === 'fill') {
       this.floodFill(pos.x, pos.y, this.strokeColor);
@@ -241,7 +301,18 @@ export class BlueprintEngine {
 
     this.isDrawing = true;
 
-    if (this.activeTool === 'freehand') {
+    // --- NORMAL STROKE ERASER (destination-out cuts through objects on drag) ---
+    if (this.activeTool === 'eraser') {
+      this.currentShape = new Konva.Line({
+        stroke: '#000000',
+        strokeWidth: 24,
+        globalCompositeOperation: 'destination-out',
+        points: [pos.x, pos.y, pos.x, pos.y],
+        tension: 0.5,
+        lineCap: 'round',
+        lineJoin: 'round'
+      });
+    } else if (this.activeTool === 'freehand') {
       this.currentShape = new Konva.Line({
         stroke: this.strokeColor,
         strokeWidth: 3,
@@ -283,20 +354,7 @@ export class BlueprintEngine {
   }
 
   handlePointerMove(e) {
-    if (!this.isDrawing) return;
-
-    // Eraser drag support
-    if (this.activeTool === 'eraser') {
-      const clickedShape = e.target;
-      if (clickedShape && clickedShape !== this.stage && clickedShape.getLayer() === this.layer) {
-        clickedShape.destroy();
-        this.layer.batchDraw();
-        this.setDirty(true);
-      }
-      return;
-    }
-
-    if (!this.currentShape) return;
+    if (!this.isDrawing || !this.currentShape || this.activeTool === 'cursor') return;
 
     const rawPos = this.stage.getPointerPosition();
     if (!rawPos) return;
@@ -306,7 +364,7 @@ export class BlueprintEngine {
       y: (rawPos.y - this.stage.y()) / this.stage.scaleY()
     };
 
-    if (this.activeTool === 'freehand') {
+    if (this.activeTool === 'freehand' || this.activeTool === 'eraser') {
       const newPoints = this.currentShape.points().concat([pos.x, pos.y]);
       this.currentShape.points(newPoints);
     } else if (this.activeTool === 'line') {

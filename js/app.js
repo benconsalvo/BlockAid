@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // --- POLISH FEATURE 2: GRID TOGGLE ---
+    // --- GRID TOGGLE ---
     const gridBtn = document.getElementById('btn-toggle-grid');
     gridBtn.addEventListener('click', () => {
       const isGridOn = engine.toggleGrid();
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // --- POLISH FEATURE 3: ZOOM CONTROLS ---
+    // --- ZOOM CONTROLS ---
     document.getElementById('btn-zoom-in').addEventListener('click', () => engine.zoomIn());
     document.getElementById('btn-zoom-out').addEventListener('click', () => engine.zoomOut());
     document.getElementById('btn-zoom-reset').addEventListener('click', () => engine.resetZoom());
@@ -460,8 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Tools handling (including Feature 1: Eraser)
-    const tools = ['freehand', 'line', 'box', 'circle', 'fill', 'eraser'];
+    // Tools handling (Including Move Canvas & Eraser)
+    const tools = ['cursor', 'freehand', 'line', 'box', 'circle', 'fill', 'eraser'];
     tools.forEach(tool => {
       document.getElementById(`tool-${tool}`).addEventListener('click', (e) => {
         tools.forEach(t => document.getElementById(`tool-${t}`).classList.remove('active'));

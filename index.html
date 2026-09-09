@@ -56,8 +56,9 @@
         <button id="btn-bp-redo" class="btn-icon" title="Redo (Ctrl+Y)">↪ Redo</button>
       </div>
 
-      <!-- Center Drawing & Polish Tools -->
+      <!-- Center Drawing & Pan Tools -->
       <div class="ribbon-group-center">
+        <button id="tool-cursor" class="btn-tool">✋ Move Canvas</button>
         <button id="tool-freehand" class="btn-tool active">✏ Freehand</button>
         <button id="tool-line" class="btn-tool">📏 Line</button>
         <button id="tool-box" class="btn-tool">🔲 Box</button>
@@ -70,7 +71,7 @@
           🎨 Color <span id="color-preview-dot" class="color-preview-dot"></span>
         </button>
 
-        <!-- Polish Tool: Grid Toggle -->
+        <!-- Grid Toggle -->
         <button id="btn-toggle-grid" class="btn-tool active" title="Toggle Grid Lines">📐 Grid: ON</button>
       </div>
 
@@ -102,7 +103,7 @@
     </div>
   </div>
 
-  <!-- CENTERED HTML PEN COLOR MODAL (Always opens in exact screen center) -->
+  <!-- CENTERED HTML PEN COLOR MODAL -->
   <div id="color-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content dialog-card" style="max-width: 320px;">
       <h3 class="dialog-title" style="text-align: center; margin-bottom: 16px;">Select Pen Color</h3>
