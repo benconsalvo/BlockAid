@@ -371,21 +371,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const colorBtn = document.getElementById('btn-color-picker');
     const colorPopover = document.getElementById('color-popover');
     const previewDot = document.getElementById('color-preview-dot');
+    const fullColorInput = document.getElementById('full-color-input');
     const hexInput = document.getElementById('hex-color-input');
-    const swatches = document.querySelectorAll('.color-swatch');
 
     const updateColor = (colorHex) => {
       engine.setColor(colorHex);
       previewDot.style.backgroundColor = colorHex;
+      fullColorInput.value = colorHex;
       hexInput.value = colorHex.toUpperCase();
-
-      swatches.forEach(s => {
-        if (s.dataset.color.toUpperCase() === colorHex.toUpperCase()) {
-          s.classList.add('active');
-        } else {
-          s.classList.remove('active');
-        }
-      });
     };
 
     colorBtn.addEventListener('click', (e) => {
@@ -393,12 +386,8 @@ document.addEventListener('DOMContentLoaded', () => {
       colorPopover.style.display = colorPopover.style.display === 'none' ? 'block' : 'none';
     });
 
-    swatches.forEach(swatch => {
-      swatch.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const selectedColor = swatch.dataset.color;
-        updateColor(selectedColor);
-      });
+    fullColorInput.addEventListener('input', (e) => {
+      updateColor(e.target.value);
     });
 
     hexInput.addEventListener('input', (e) => {
@@ -433,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    const tools = ['freehand', 'line', 'box', 'circle'];
+    const tools = ['freehand', 'line', 'box', 'circle', 'fill'];
     tools.forEach(tool => {
       document.getElementById(`tool-${tool}`).addEventListener('click', (e) => {
         tools.forEach(t => document.getElementById(`tool-${t}`).classList.remove('active'));

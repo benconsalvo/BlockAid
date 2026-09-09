@@ -62,6 +62,7 @@
         <button id="tool-line" class="btn-tool">📏 Line</button>
         <button id="tool-box" class="btn-tool">🔲 Box</button>
         <button id="tool-circle" class="btn-tool">⭕ Circle</button>
+        <button id="tool-fill" class="btn-tool">🪣 Fill</button>
         
         <!-- Custom Pen Color Picker Dropdown -->
         <div class="color-picker-container">
@@ -69,19 +70,15 @@
             🎨 Color <span id="color-preview-dot" class="color-preview-dot"></span>
           </button>
           
-          <!-- Dropdown Popover Box -->
+          <!-- Dropdown Popover Box Under Button -->
           <div id="color-popover" class="color-popover" style="display: none;">
             <div class="popover-title">Pen Color</div>
-            <div class="color-swatches">
-              <button class="color-swatch active" data-color="#1C1C1C" style="background-color: #1C1C1C;" title="Dark Charcoal"></button>
-              <button class="color-swatch" data-color="#7C1013" style="background-color: #7C1013;" title="Deep Crimson"></button>
-              <button class="color-swatch" data-color="#D4AF37" style="background-color: #D4AF37;" title="Phoenix Gold"></button>
-              <button class="color-swatch" data-color="#F4F4F6" style="background-color: #F4F4F6;" title="Off-White"></button>
-              <button class="color-swatch" data-color="#51CF66" style="background-color: #51CF66;" title="Green"></button>
-              <button class="color-swatch" data-color="#4A90E2" style="background-color: #4A90E2;" title="Blue"></button>
-              <button class="color-swatch" data-color="#F5A623" style="background-color: #F5A623;" title="Orange"></button>
-              <button class="color-swatch" data-color="#9013FE" style="background-color: #9013FE;" title="Purple"></button>
+            
+            <div class="color-picker-main-row">
+              <label for="full-color-input" class="full-color-label">Color Spectrum / Wheel:</label>
+              <input type="color" id="full-color-input" value="#1C1C1C" class="full-color-input">
             </div>
+
             <div class="hex-input-row">
               <label for="hex-color-input">HEX:</label>
               <input type="text" id="hex-color-input" value="#1C1C1C" maxlength="7" placeholder="#1C1C1C">

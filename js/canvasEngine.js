@@ -1,12 +1,32 @@
 // js/canvasEngine.js
 
+function hexToRgb(hex) {
+  let cleanHex = hex.replace('#', '');
+  if (cleanHex.length === 3) {
+    cleanHex = cleanHex.split('').map(c => c + c).join('');
+  }
+  const num = parseInt(cleanHex, 16);
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255
+  };
+}
+
+function colorMatch(r1, g1, b1, a1, r2, g2, b2, a2, tolerance = 32) {
+  return Math.abs(r1 - r2) <= tolerance &&
+         Math.abs(g1 - g2) <= tolerance &&
+         Math.abs(b1 - b2) <= tolerance &&
+         Math.abs(a1 - a2) <= tolerance;
+}
+
 export class BlueprintEngine {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
     this.stage = null;
     this.layer = null;
     
-    this.activeTool = 'freehand'; // 'freehand', 'line', 'box', 'circle'
+    this.activeTool = 'freehand'; // 'freehand', 'line', 'box', 'circle', 'fill'
     this.strokeColor = '#1C1C1C';
     this.activeFloor = 1;
     this.floorsData = { 1: null };
@@ -67,8 +87,15 @@ export class BlueprintEngine {
   }
 
   handlePointerDown(e) {
-    this.isDrawing = true;
     const pos = this.stage.getPointerPosition();
+    if (!pos) return;
+
+    if (this.activeTool === 'fill') {
+      this.floodFill(pos.x, pos.y, this.strokeColor);
+      return;
+    }
+
+    this.isDrawing = true;
 
     if (this.activeTool === 'freehand') {
       this.currentShape = new Konva.Line({
@@ -114,6 +141,7 @@ export class BlueprintEngine {
   handlePointerMove(e) {
     if (!this.isDrawing || !this.currentShape) return;
     const pos = this.stage.getPointerPosition();
+    if (!pos) return;
 
     if (this.activeTool === 'freehand') {
       const newPoints = this.currentShape.points().concat([pos.x, pos.y]);
@@ -144,6 +172,84 @@ export class BlueprintEngine {
       this.currentShape = null;
       this.setDirty(true);
     }
+  }
+
+  floodFill(startX, startY, fillColorHex) {
+    const width = Math.floor(this.stage.width());
+    const height = Math.floor(this.stage.height());
+    const sX = Math.floor(startX);
+    const sY = Math.floor(startY);
+
+    if (sX < 0 || sX >= width || sY < 0 || sY >= height) return;
+
+    const stageCanvas = this.layer.toCanvas({ pixelRatio: 1 });
+    const ctx = stageCanvas.getContext('2d');
+    const imgData = ctx.getImageData(0, 0, width, height);
+    const data = imgData.data;
+
+    const startPos = (sY * width + sX) * 4;
+    const startR = data[startPos];
+    const startG = data[startPos + 1];
+    const startB = data[startPos + 2];
+    const startA = data[startPos + 3];
+
+    const fillRgb = hexToRgb(fillColorHex);
+    if (!fillRgb) return;
+
+    if (colorMatch(startR, startG, startB, startA, fillRgb.r, fillRgb.g, fillRgb.b, 255)) {
+      return;
+    }
+
+    const maskCanvas = document.createElement('canvas');
+    maskCanvas.width = width;
+    maskCanvas.height = height;
+    const maskCtx = maskCanvas.getContext('2d');
+    const maskImgData = maskCtx.createImageData(width, height);
+    const maskData = maskImgData.data;
+
+    const queue = [sX, sY];
+    const visited = new Uint8Array(width * height);
+
+    while (queue.length > 0) {
+      const cy = queue.pop();
+      const cx = queue.pop();
+
+      const idx = cy * width + cx;
+      if (visited[idx]) continue;
+      visited[idx] = 1;
+
+      const p = idx * 4;
+      if (colorMatch(data[p], data[p + 1], data[p + 2], data[p + 3], startR, startG, startB, startA)) {
+        maskData[p] = fillRgb.r;
+        maskData[p + 1] = fillRgb.g;
+        maskData[p + 2] = fillRgb.b;
+        maskData[p + 3] = 255;
+
+        if (cx > 0) queue.push(cx - 1, cy);
+        if (cx < width - 1) queue.push(cx + 1, cy);
+        if (cy > 0) queue.push(cx, cy - 1);
+        if (cy < height - 1) queue.push(cx, cy + 1);
+      }
+    }
+
+    maskCtx.putImageData(maskImgData, 0, 0);
+
+    const imgObj = new Image();
+    imgObj.src = maskCanvas.toDataURL();
+    imgObj.onload = () => {
+      const konvaImg = new Konva.Image({
+        x: 0,
+        y: 0,
+        image: imgObj,
+        width: width,
+        height: height
+      });
+      this.layer.add(konvaImg);
+      konvaImg.moveToBottom();
+      this.layer.batchDraw();
+      this.saveState();
+      this.setDirty(true);
+    };
   }
 
   saveState() {
