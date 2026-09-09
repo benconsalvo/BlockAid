@@ -84,6 +84,13 @@ function formatTime(ms) {
   return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${tenths}`;
 }
 
+// Clean filename display formatting without underscores
+function formatDisplayName(filename) {
+  return filename
+    .replace('.json', '')
+    .replace(/_/g, ' ');
+}
+
 // --- MAIN APPLICATION LOGIC ---
 document.addEventListener('DOMContentLoaded', () => {
   let engine = null;
@@ -171,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       blueprintsList.innerHTML = '';
       files.forEach(file => {
-        const displayName = file.name.replace('.json', '');
+        const displayName = formatDisplayName(file.name);
         const li = document.createElement('li');
         li.className = 'item-row';
         li.innerHTML = `
@@ -189,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'blueprint', false));
       });
 
-      // FIX ISSUE 3: PROMPT FOR NEW BLOCKING FILE NAME WHEN CREATED FROM BLUEPRINT
       document.querySelectorAll('.btn-create-blocking').forEach(btn => {
         btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'recording', true));
       });
@@ -197,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.btn-delete-bp').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const path = e.currentTarget.dataset.path;
-          const confirmed = await customConfirm(`Are you sure you want to delete ${path.replace('Blueprints/', '')}?`, 'Delete Blueprint');
+          const confirmed = await customConfirm(`Are you sure you want to delete ${formatDisplayName(path.replace('Blueprints/', ''))}?`, 'Delete Blueprint');
           if (confirmed) {
             await deleteFileFromRepository(path);
             renderBlueprints();
@@ -220,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       recordingsList.innerHTML = '';
       files.forEach(file => {
-        const displayName = file.name.replace('.json', '');
+        const displayName = formatDisplayName(file.name);
         const li = document.createElement('li');
         li.className = 'item-row';
         li.innerHTML = `
@@ -240,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.btn-delete-rec').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const path = e.currentTarget.dataset.path;
-          const confirmed = await customConfirm(`Are you sure you want to delete ${path.replace('Recordings/', '')}?`, 'Delete Blocking');
+          const confirmed = await customConfirm(`Are you sure you want to delete ${formatDisplayName(path.replace('Recordings/', ''))}?`, 'Delete Blocking');
           if (confirmed) {
             await deleteFileFromRepository(path);
             renderRecordings();
@@ -261,14 +267,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const fileData = await fetchFileContent(filePath);
       
       if (isNewBlocking) {
-        const defaultTakeName = `${fileData.content.name} - Take 1`;
+        const cleanOriginalName = formatDisplayName(fileData.content.name || 'Blueprint');
+        const defaultTakeName = `${cleanOriginalName} - Take 1`;
         const recName = await customPrompt('Enter New Stage Blocking Name:', defaultTakeName, 'Create New Blocking');
         if (!recName) return; // User cancelled
         currentBlueprintId = `rec_${Date.now()}`;
         currentBlueprintName = recName.trim();
       } else {
         currentBlueprintId = fileData.content.id;
-        currentBlueprintName = fileData.content.name;
+        currentBlueprintName = formatDisplayName(fileData.content.name || '');
       }
     } else {
       const nameInput = await customPrompt('Enter Blueprint Name:', 'New Stage Blueprint', 'Create Blueprint');
@@ -660,7 +667,8 @@ document.addEventListener('DOMContentLoaded', () => {
   async function saveBlueprintData() {
     const exportData = engine.exportJSON(currentBlueprintId, currentBlueprintName);
     const targetFolder = activeMode === 'recording' ? 'Recordings' : 'Blueprints';
-    const fileName = `${currentBlueprintName.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`;
+    const cleanFileName = currentBlueprintName.replace(/[/\\?%*:|"<>]/g, '-').trim();
+    const fileName = `${cleanFileName}.json`;
     
     try {
       await saveFileToRepository(targetFolder, fileName, exportData, `Save ${targetFolder} ${currentBlueprintName}`);

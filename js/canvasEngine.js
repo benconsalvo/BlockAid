@@ -50,6 +50,7 @@ export class BlueprintEngine {
     this.recordingInterval = null;
     this.playbackAnimFrame = null;
     this.playbackStartTime = 0;
+    this.playbackFrameIndex = 0;
 
     this.undoStack = [];
     this.redoStack = [];
@@ -181,7 +182,7 @@ export class BlueprintEngine {
 
     this.recordingInterval = setInterval(() => {
       this.recordFrame();
-    }, 100);
+    }, 50); // Sample coordinates every 50ms for smooth precision
   }
 
   recordFrame() {
@@ -234,13 +235,14 @@ export class BlueprintEngine {
     this.setDirty(true);
   }
 
-  // --- PLAYBACK LOGIC ---
+  // --- SMOOTH PLAYBACK WITH LINEAR INTERPOLATION (LERP) ---
   startPlayback() {
     if (this.recordedFrames.length === 0) return;
     if (this.isRecording) this.stopRecording();
 
     this.isPlaying = true;
     this.isPaused = false;
+    this.playbackFrameIndex = 0;
     this.playbackStartTime = Date.now();
     this.drawPlaybackTrails();
     this.playLoop();
@@ -256,7 +258,8 @@ export class BlueprintEngine {
         this.onTimerUpdateCallback(currentRecTime);
       }
 
-      const triggeredNote = this.notes.find(n => Math.abs(n.timestamp - currentRecTime) < 120);
+      // Trigger Stage Director Notes
+      const triggeredNote = this.notes.find(n => Math.abs(n.timestamp - currentRecTime) < 80);
       if (triggeredNote && !triggeredNote.shown) {
         triggeredNote.shown = true;
         this.isPaused = true;
@@ -265,20 +268,48 @@ export class BlueprintEngine {
         }
       }
 
-      const frame = this.recordedFrames.find(f => f.timestamp >= currentRecTime);
-      if (frame) {
-        Object.keys(frame.performerData).forEach(id => {
-          const data = frame.performerData[id];
+      // Advance frame index to current playback window
+      while (
+        this.playbackFrameIndex < this.recordedFrames.length - 1 &&
+        this.recordedFrames[this.playbackFrameIndex + 1].timestamp <= currentRecTime
+      ) {
+        this.playbackFrameIndex++;
+      }
+
+      const frameA = this.recordedFrames[this.playbackFrameIndex];
+      const frameB = this.recordedFrames[this.playbackFrameIndex + 1];
+
+      if (frameA) {
+        Object.keys(this.performers).forEach(id => {
           const p = this.performers[id];
-          if (p) {
-            if (data.floor !== this.activeFloor) {
-              this.switchFloor(data.floor);
+          const dataA = frameA.performerData[id];
+          const dataB = frameB ? frameB.performerData[id] : null;
+
+          if (p && dataA) {
+            let targetX = dataA.x;
+            let targetY = dataA.y;
+            let targetFloor = dataA.floor;
+
+            // Interpolate position between frameA and frameB for 60fps smooth rendering
+            if (dataB && frameB.timestamp > frameA.timestamp) {
+              const ratio = (currentRecTime - frameA.timestamp) / (frameB.timestamp - frameA.timestamp);
+              const t = Math.max(0, Math.min(1, ratio));
+              targetX = dataA.x + (dataB.x - dataA.x) * t;
+              targetY = dataA.y + (dataB.y - dataA.y) * t;
             }
-            p.group.position({ x: data.x, y: data.y });
+
+            if (targetFloor !== this.activeFloor) {
+              this.switchFloor(targetFloor);
+            }
+
+            p.group.position({ x: targetX, y: targetY });
           }
         });
         this.tokenLayer.batchDraw();
-      } else {
+      }
+
+      // Stop playback at end of recording
+      if (!frameB && currentRecTime >= (frameA ? frameA.timestamp : 0)) {
         this.stopPlayback();
         return;
       }
@@ -531,7 +562,6 @@ export class BlueprintEngine {
       return;
     }
 
-    // FIX ISSUE 2: PREVENT DRAWING ARTIFACT WHEN CLICKING PERFORMER TOKENS
     if (e.target && (e.target.getLayer() === this.tokenLayer || e.target.name() === 'performer-token')) {
       return;
     }
