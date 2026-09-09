@@ -108,6 +108,20 @@
     </div>
   </div>
 
+  <!-- GENERIC CUSTOM DIALOG MODAL (Replaces Browser alert, confirm, prompt) -->
+  <div id="custom-dialog-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content dialog-card">
+      <h3 id="dialog-title" class="dialog-title">Notice</h3>
+      <p id="dialog-message" class="dialog-message"></p>
+      <input type="text" id="dialog-input" class="dialog-input" style="display: none;">
+      
+      <div class="dialog-actions">
+        <button id="dialog-btn-cancel" class="btn-secondary" style="display: none;">Cancel</button>
+        <button id="dialog-btn-confirm" class="btn-primary">OK</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

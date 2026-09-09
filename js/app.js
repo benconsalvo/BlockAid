@@ -11,33 +11,146 @@ import {
 
 import { BlueprintEngine } from './canvasEngine.js';
 
+// --- CUSTOM ASYNCHRONOUS DIALOG HELPER FUNCTIONS ---
+function showCustomDialog({ title = 'Notice', message = '', showInput = false, defaultValue = '', showCancel = false, confirmText = 'OK', cancelText = 'Cancel' }) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('custom-dialog-modal');
+    const titleEl = document.getElementById('dialog-title');
+    const msgEl = document.getElementById('dialog-message');
+    const inputEl = document.getElementById('dialog-input');
+    const confirmBtn = document.getElementById('dialog-btn-confirm');
+    const cancelBtn = document.getElementById('dialog-btn-cancel');
+
+    titleEl.textContent = title;
+    msgEl.textContent = message;
+
+    if (showInput) {
+      inputEl.style.display = 'block';
+      inputEl.value = defaultValue;
+    } else {
+      inputEl.style.display = 'none';
+    }
+
+    if (showCancel) {
+      cancelBtn.style.display = 'inline-block';
+      cancelBtn.textContent = cancelText;
+    } else {
+      cancelBtn.style.display = 'none';
+    }
+
+    confirmBtn.textContent = confirmText;
+    modal.style.display = 'flex';
+
+    if (showInput) {
+      setTimeout(() => inputEl.focus(), 50);
+    }
+
+    const cleanup = () => {
+      modal.style.display = 'none';
+      confirmBtn.onclick = null;
+      cancelBtn.onclick = null;
+      inputEl.onkeydown = null;
+    };
+
+    confirmBtn.onclick = () => {
+      const result = showInput ? inputEl.value : true;
+      cleanup();
+      resolve(result);
+    };
+
+    cancelBtn.onclick = () => {
+      cleanup();
+      resolve(showInput ? null : false);
+    };
+
+    if (showInput) {
+      inputEl.onkeydown = (e) => {
+        if (e.key === 'Enter') confirmBtn.click();
+        if (e.key === 'Escape' && showCancel) cancelBtn.click();
+      };
+    }
+  });
+}
+
+const customAlert = (msg, title = 'Notice') => showCustomDialog({ title, message: msg, showCancel: false });
+const customConfirm = (msg, title = 'Confirm Action') => showCustomDialog({ title, message: msg, showCancel: true });
+const customPrompt = (msg, defaultVal = '', title = 'Input Required') => showCustomDialog({ title, message: msg, showInput: true, defaultValue: defaultVal, showCancel: true });
+
+// --- MAIN APPLICATION LOGIC ---
 document.addEventListener('DOMContentLoaded', () => {
   let engine = null;
   let currentBlueprintId = null;
   let currentBlueprintName = '';
 
-  // DOM Elements
   const viewMainMenu = document.getElementById('view-main-menu');
   const viewBlueprintCanvas = document.getElementById('view-blueprint-canvas');
   const settingsModal = document.getElementById('settings-modal');
   const dirtyDot = document.getElementById('save-dirty-dot');
 
-  // Load existing credentials
+  const ownerInput = document.getElementById('gh-owner');
+  const repoInput = document.getElementById('gh-repo');
+  const tokenInput = document.getElementById('gh-token');
+  const statusMsg = document.getElementById('status-message');
+
+  const blueprintsList = document.getElementById('blueprints-list');
+  const recordingsList = document.getElementById('recordings-list');
+  const createBlueprintBtn = document.getElementById('btn-create-blueprint');
+
+  // Credentials Check
   const config = getGitHubConfig();
   if (config) {
+    ownerInput.value = config.owner || '';
+    repoInput.value = config.repo || '';
+    tokenInput.value = config.token || '';
     loadData();
   } else {
     settingsModal.style.display = 'flex';
   }
 
-  // --- MAIN MENU FUNCTIONS ---
+  // Settings Handlers
+  document.getElementById('btn-open-settings').addEventListener('click', () => {
+    settingsModal.style.display = 'flex';
+  });
+
+  document.getElementById('btn-close-settings').addEventListener('click', () => {
+    settingsModal.style.display = 'none';
+  });
+
+  document.getElementById('btn-save-settings').addEventListener('click', async () => {
+    const owner = ownerInput.value.trim();
+    const repo = repoInput.value.trim();
+    const token = tokenInput.value.trim();
+
+    if (!owner || !repo || !token) {
+      statusMsg.textContent = 'Please fill in all fields.';
+      statusMsg.style.color = '#FF6B6B';
+      return;
+    }
+
+    saveGitHubConfig(owner, repo, token);
+    statusMsg.textContent = 'Testing connection...';
+    statusMsg.style.color = '#D4AF37';
+
+    try {
+      await listRepositoryFiles('Blueprints');
+      statusMsg.textContent = 'Connected successfully!';
+      statusMsg.style.color = '#51CF66';
+      setTimeout(() => {
+        settingsModal.style.display = 'none';
+        loadData();
+      }, 800);
+    } catch (err) {
+      statusMsg.textContent = `Connection failed: ${err.message}`;
+      statusMsg.style.color = '#FF6B6B';
+    }
+  });
+
   async function loadData() {
     await renderBlueprints();
     await renderRecordings();
   }
 
   async function renderBlueprints() {
-    const blueprintsList = document.getElementById('blueprints-list');
     blueprintsList.innerHTML = '<li class="empty-message">Loading blueprints...</li>';
     try {
       const files = await listRepositoryFiles('Blueprints');
@@ -62,15 +175,16 @@ document.addEventListener('DOMContentLoaded', () => {
         blueprintsList.appendChild(li);
       });
 
-      // Actions
       document.querySelectorAll('.btn-edit-bp').forEach(btn => {
         btn.addEventListener('click', (e) => openBlueprintCanvas(e.target.dataset.path));
       });
 
       document.querySelectorAll('.btn-delete-bp').forEach(btn => {
         btn.addEventListener('click', async (e) => {
-          if (confirm('Delete this blueprint?')) {
-            await deleteFileFromRepository(e.target.dataset.path);
+          const path = e.target.dataset.path;
+          const confirmed = await customConfirm(`Are you sure you want to delete ${path.replace('Blueprints/', '')}?`, 'Delete Blueprint');
+          if (confirmed) {
+            await deleteFileFromRepository(path);
             renderBlueprints();
           }
         });
@@ -82,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function renderRecordings() {
-    const recordingsList = document.getElementById('recordings-list');
     recordingsList.innerHTML = '<li class="empty-message">Loading saved blockings...</li>';
     try {
       const files = await listRepositoryFiles('Recordings');
@@ -104,13 +217,36 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         recordingsList.appendChild(li);
       });
+
+      document.querySelectorAll('.btn-delete-rec').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const path = e.target.dataset.path;
+          const confirmed = await customConfirm(`Are you sure you want to delete ${path.replace('Recordings/', '')}?`, 'Delete Blocking');
+          if (confirmed) {
+            await deleteFileFromRepository(path);
+            renderRecordings();
+          }
+        });
+      });
+
     } catch (err) {
       recordingsList.innerHTML = `<li class="empty-message" style="color: #FF6B6B;">Error: ${err.message}</li>`;
     }
   }
 
-  // --- CANVAS INITIALIZATION ---
+  // --- CANVAS LAUNCH & BINDINGS ---
   async function openBlueprintCanvas(filePath = null) {
+    if (filePath) {
+      const fileData = await fetchFileContent(filePath);
+      currentBlueprintId = fileData.content.id;
+      currentBlueprintName = fileData.content.name;
+    } else {
+      const nameInput = await customPrompt('Enter Blueprint Name:', 'New Stage Blueprint', 'Create Blueprint');
+      if (!nameInput) return; // User cancelled
+      currentBlueprintId = `bp_${Date.now()}`;
+      currentBlueprintName = nameInput.trim();
+    }
+
     viewMainMenu.style.display = 'none';
     viewBlueprintCanvas.style.display = 'flex';
 
@@ -125,12 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (filePath) {
       const fileData = await fetchFileContent(filePath);
-      currentBlueprintId = fileData.content.id;
-      currentBlueprintName = fileData.content.name;
       engine.loadJSON(fileData.content);
     } else {
-      currentBlueprintId = `bp_${Date.now()}`;
-      currentBlueprintName = prompt('Enter Blueprint Name:', 'New Stage Blueprint') || 'New Stage Blueprint';
       engine.loadJSON({ floors: [{ level: 1, layerData: null }] });
     }
 
@@ -155,10 +287,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function bindCanvasToolEvents() {
-    // Main Menu Button
     document.getElementById('btn-bp-main-menu').addEventListener('click', async () => {
       if (engine.isDirty) {
-        if (confirm('You have unsaved changes. Would you like to save before leaving?')) {
+        const shouldSave = await customConfirm('You have unsaved changes. Would you like to save before leaving?', 'Unsaved Changes');
+        if (shouldSave) {
           await saveBlueprintData();
         }
       }
@@ -167,14 +299,27 @@ document.addEventListener('DOMContentLoaded', () => {
       loadData();
     });
 
-    // Save Button
     document.getElementById('btn-bp-save').addEventListener('click', saveBlueprintData);
-
-    // Undo / Redo
     document.getElementById('btn-bp-undo').addEventListener('click', () => engine.undo());
     document.getElementById('btn-bp-redo').addEventListener('click', () => engine.redo());
 
-    // Tools
+    // Keyboard Shortcuts for Undo (Ctrl+Z / Cmd+Z) and Redo (Ctrl+Y / Cmd+Y / Ctrl+Shift+Z)
+    window.addEventListener('keydown', (e) => {
+      if (viewBlueprintCanvas.style.display === 'none') return;
+
+      const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+
+      if (isCmdOrCtrl) {
+        if (e.key.toLowerCase() === 'z' && !e.shiftKey) {
+          e.preventDefault();
+          engine.undo();
+        } else if (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey)) {
+          e.preventDefault();
+          engine.redo();
+        }
+      }
+    });
+
     const tools = ['freehand', 'line', 'box', 'circle'];
     tools.forEach(tool => {
       document.getElementById(`tool-${tool}`).addEventListener('click', (e) => {
@@ -184,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Add Floor
     document.getElementById('btn-add-floor').addEventListener('click', () => {
       engine.addFloor();
       renderFloorButtons();
@@ -198,12 +342,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       await saveFileToRepository('Blueprints', fileName, exportData, `Save blueprint ${currentBlueprintName}`);
       engine.setDirty(false);
-      alert('Blueprint saved successfully!');
+      await customAlert('Blueprint saved successfully!', 'Success');
     } catch (err) {
-      alert(`Save failed: ${err.message}`);
+      await customAlert(`Save failed: ${err.message}`, 'Error');
     }
   }
 
-  // Bind New Blueprint button
-  document.getElementById('btn-create-blueprint').addEventListener('click', () => openBlueprintCanvas());
+  createBlueprintBtn.addEventListener('click', () => openBlueprintCanvas());
 });

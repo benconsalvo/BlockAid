@@ -200,6 +200,42 @@ body {
   color: #FFF;
 }
 
+/* CUSTOM DIALOG MODAL STYLES */
+.dialog-card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.dialog-title {
+  margin-top: 0;
+  color: var(--color-gold);
+  font-size: 20px;
+}
+
+.dialog-message {
+  margin: 16px 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.dialog-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: var(--color-bg);
+  color: #FFF;
+  font-size: 15px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
 /* CANVAS SCREEN LAYOUT */
 .canvas-screen-container {
   display: flex;
