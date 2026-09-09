@@ -64,27 +64,10 @@
         <button id="tool-circle" class="btn-tool">⭕ Circle</button>
         <button id="tool-fill" class="btn-tool">🪣 Fill</button>
         
-        <!-- Custom Pen Color Picker Dropdown -->
-        <div class="color-picker-container">
-          <button id="btn-color-picker" class="btn-tool color-picker-btn" title="Change Pen Color">
-            🎨 Color <span id="color-preview-dot" class="color-preview-dot"></span>
-          </button>
-          
-          <!-- Dropdown Popover Box Under Button -->
-          <div id="color-popover" class="color-popover" style="display: none;">
-            <div class="popover-title">Pen Color</div>
-            
-            <div class="color-picker-main-row">
-              <label for="full-color-input" class="full-color-label">Color Spectrum / Wheel:</label>
-              <input type="color" id="full-color-input" value="#1C1C1C" class="full-color-input">
-            </div>
-
-            <div class="hex-input-row">
-              <label for="hex-color-input">HEX:</label>
-              <input type="text" id="hex-color-input" value="#1C1C1C" maxlength="7" placeholder="#1C1C1C">
-            </div>
-          </div>
-        </div>
+        <!-- Pen Color Trigger Button -->
+        <button id="btn-color-picker" class="btn-tool color-picker-btn" title="Change Pen Color">
+          🎨 Color <span id="color-preview-dot" class="color-preview-dot"></span>
+        </button>
       </div>
 
       <div class="ribbon-group-right"></div>
@@ -106,6 +89,27 @@
     <!-- Bottom Stage Direction Bar -->
     <div class="bottom-direction-bar">
       <span>AUDIENCE</span>
+    </div>
+  </div>
+
+  <!-- CENTERED PEN COLOR MODAL -->
+  <div id="color-popover" class="modal-overlay" style="display: none;">
+    <div class="modal-content dialog-card" style="max-width: 280px;">
+      <h3 class="dialog-title" style="text-align: center; margin-bottom: 16px;">Pen Color</h3>
+      
+      <div class="color-picker-main-row">
+        <label for="full-color-input" class="full-color-label">Color Spectrum / Wheel:</label>
+        <input type="color" id="full-color-input" value="#1C1C1C" class="full-color-input">
+      </div>
+
+      <div class="hex-input-row">
+        <label for="hex-color-input">HEX:</label>
+        <input type="text" id="hex-color-input" value="#1C1C1C" maxlength="7" placeholder="#1C1C1C">
+      </div>
+
+      <div class="dialog-actions" style="margin-top: 20px;">
+        <button id="btn-close-color-picker" class="btn-primary" style="width: 100%;">Done</button>
+      </div>
     </div>
   </div>
 

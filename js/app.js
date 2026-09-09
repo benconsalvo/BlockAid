@@ -367,9 +367,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-bp-undo').addEventListener('click', () => engine.undo());
     document.getElementById('btn-bp-redo').addEventListener('click', () => engine.redo());
 
-    // COLOR PICKER POPOVER LOGIC
+    // CENTERED COLOR MODAL LOGIC
     const colorBtn = document.getElementById('btn-color-picker');
     const colorPopover = document.getElementById('color-popover');
+    const closeColorBtn = document.getElementById('btn-close-color-picker');
     const previewDot = document.getElementById('color-preview-dot');
     const fullColorInput = document.getElementById('full-color-input');
     const hexInput = document.getElementById('hex-color-input');
@@ -381,9 +382,12 @@ document.addEventListener('DOMContentLoaded', () => {
       hexInput.value = colorHex.toUpperCase();
     };
 
-    colorBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      colorPopover.style.display = colorPopover.style.display === 'none' ? 'block' : 'none';
+    colorBtn.addEventListener('click', () => {
+      colorPopover.style.display = 'flex';
+    });
+
+    closeColorBtn.addEventListener('click', () => {
+      colorPopover.style.display = 'none';
     });
 
     fullColorInput.addEventListener('input', (e) => {
@@ -398,9 +402,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Close popover when clicking anywhere outside
-    document.addEventListener('click', (e) => {
-      if (colorPopover && !colorPopover.contains(e.target) && e.target !== colorBtn && !colorBtn.contains(e.target)) {
+    // Dismiss color modal when clicking on the dark backdrop overlay
+    colorPopover.addEventListener('click', (e) => {
+      if (e.target === colorPopover) {
         colorPopover.style.display = 'none';
       }
     });
