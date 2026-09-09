@@ -3,74 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BlockAid - Settings Setup</title>
-  <style>
-    body {
-      background-color: #1C1C1C;
-      color: #F4F4F6;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .setup-card {
-      background-color: #2A2A2A;
-      padding: 32px;
-      border-radius: 8px;
-      border: 1px solid #D4AF37;
-      width: 100%;
-      max-width: 400px;
-    }
-    h2 { color: #D4AF37; margin-top: 0; }
-    label { display: block; margin: 12px 0 4px; font-size: 14px; }
-    input {
-      width: 100%;
-      padding: 10px;
-      box-sizing: border-box;
-      border-radius: 4px;
-      border: 1px solid #555;
-      background: #1C1C1C;
-      color: #FFF;
-    }
-    button {
-      width: 100%;
-      margin-top: 20px;
-      padding: 12px;
-      background-color: #7C1013;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #status-message {
-      margin-top: 16px;
-      font-size: 14px;
-      text-align: center;
-      word-break: break-word;
-    }
-  </style>
+  <title>BlockAid - Main Menu</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-  <div class="setup-card">
-    <h2>GitHub Configuration</h2>
-    
-    <label for="gh-owner">GitHub Username / Org:</label>
-    <input type="text" id="gh-owner" placeholder="Fill in: e.g. username">
+  <!-- Main Menu Box -->
+  <div class="main-menu-container">
+    <div class="menu-header">
+      <h1>BlockAid</h1>
+      <button id="btn-open-settings" class="btn-icon">⚙ Settings</button>
+    </div>
 
-    <label for="gh-repo">Repository Name:</label>
-    <input type="text" id="gh-repo" placeholder="Fill in: e.g. BlockAid">
+    <!-- Blueprints Box -->
+    <div class="section-box">
+      <div class="section-title-row">
+        <h2>Blueprints</h2>
+        <button id="btn-create-blueprint" class="btn-primary">+ New Blueprint</button>
+      </div>
+      <ul id="blueprints-list" class="item-list">
+        <li class="empty-message">Loading blueprints...</li>
+      </ul>
+    </div>
 
-    <label for="gh-token">Personal Access Token (PAT):</label>
-    <input type="password" id="gh-token" placeholder="Fill in: ghp_xxxxxxxxxxxx">
-
-    <button id="btn-save">Save & Test Connection</button>
-    <div id="status-message"></div>
+    <!-- Saved Blockings Box -->
+    <div class="section-box">
+      <div class="section-title-row">
+        <h2>Saved Blockings</h2>
+      </div>
+      <ul id="recordings-list" class="item-list">
+        <li class="empty-message">Loading saved blockings...</li>
+      </ul>
+    </div>
   </div>
 
-  <script type="module" src="./app.js"></script>
+  <!-- Settings Modal (Hidden by Default) -->
+  <div id="settings-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h2 style="color: var(--color-gold); margin-top: 0;">GitHub Settings</h2>
+      
+      <label for="gh-owner">GitHub Username / Org:</label>
+      <input type="text" id="gh-owner" placeholder="e.g. username">
+
+      <label for="gh-repo">Repository Name:</label>
+      <input type="text" id="gh-repo" placeholder="e.g. BlockAid">
+
+      <label for="gh-token">Personal Access Token (PAT):</label>
+      <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
+
+      <button id="btn-save-settings" class="btn-primary" style="width: 100%; margin-top: 20px;">
+        Save & Test Connection
+      </button>
+      <button id="btn-close-settings" class="btn-secondary" style="width: 100%; margin-top: 8px;">
+        Close
+      </button>
+      <div id="status-message" style="margin-top: 16px; text-align: center;"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
