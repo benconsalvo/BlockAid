@@ -367,13 +367,54 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-bp-undo').addEventListener('click', () => engine.undo());
     document.getElementById('btn-bp-redo').addEventListener('click', () => engine.redo());
 
-    // Color Picker Event Listener
-    const colorInput = document.getElementById('tool-color');
-    if (colorInput) {
-      colorInput.addEventListener('input', (e) => {
-        engine.setColor(e.target.value);
+    // COLOR PICKER POPOVER LOGIC
+    const colorBtn = document.getElementById('btn-color-picker');
+    const colorPopover = document.getElementById('color-popover');
+    const previewDot = document.getElementById('color-preview-dot');
+    const hexInput = document.getElementById('hex-color-input');
+    const swatches = document.querySelectorAll('.color-swatch');
+
+    const updateColor = (colorHex) => {
+      engine.setColor(colorHex);
+      previewDot.style.backgroundColor = colorHex;
+      hexInput.value = colorHex.toUpperCase();
+
+      swatches.forEach(s => {
+        if (s.dataset.color.toUpperCase() === colorHex.toUpperCase()) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
       });
-    }
+    };
+
+    colorBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      colorPopover.style.display = colorPopover.style.display === 'none' ? 'block' : 'none';
+    });
+
+    swatches.forEach(swatch => {
+      swatch.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const selectedColor = swatch.dataset.color;
+        updateColor(selectedColor);
+      });
+    });
+
+    hexInput.addEventListener('input', (e) => {
+      let val = e.target.value.trim();
+      if (!val.startsWith('#')) val = '#' + val;
+      if (/^#[0-9A-F]{6}$/i.test(val)) {
+        updateColor(val);
+      }
+    });
+
+    // Close popover when clicking anywhere outside
+    document.addEventListener('click', (e) => {
+      if (colorPopover && !colorPopover.contains(e.target) && e.target !== colorBtn && !colorBtn.contains(e.target)) {
+        colorPopover.style.display = 'none';
+      }
+    });
 
     // Keyboard Shortcuts for Undo (Ctrl+Z / Cmd+Z) and Redo (Ctrl+Y / Cmd+Y / Ctrl+Shift+Z)
     window.addEventListener('keydown', (e) => {
