@@ -186,11 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       document.querySelectorAll('.btn-edit-bp').forEach(btn => {
-        btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'blueprint'));
+        btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'blueprint', false));
       });
 
+      // FIX ISSUE 3: PROMPT FOR NEW BLOCKING FILE NAME WHEN CREATED FROM BLUEPRINT
       document.querySelectorAll('.btn-create-blocking').forEach(btn => {
-        btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'recording'));
+        btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'recording', true));
       });
 
       document.querySelectorAll('.btn-delete-bp').forEach(btn => {
@@ -233,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       document.querySelectorAll('.btn-edit-rec').forEach(btn => {
-        btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'recording'));
+        btn.addEventListener('click', (e) => openBlueprintCanvas(e.currentTarget.dataset.path, 'recording', false));
       });
 
       document.querySelectorAll('.btn-delete-rec').forEach(btn => {
@@ -253,13 +254,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- CANVAS LAUNCH & BINDINGS ---
-  async function openBlueprintCanvas(filePath = null, mode = 'blueprint') {
+  async function openBlueprintCanvas(filePath = null, mode = 'blueprint', isNewBlocking = false) {
     activeMode = mode;
     
     if (filePath) {
       const fileData = await fetchFileContent(filePath);
-      currentBlueprintId = fileData.content.id;
-      currentBlueprintName = fileData.content.name;
+      
+      if (isNewBlocking) {
+        const defaultTakeName = `${fileData.content.name} - Take 1`;
+        const recName = await customPrompt('Enter New Stage Blocking Name:', defaultTakeName, 'Create New Blocking');
+        if (!recName) return; // User cancelled
+        currentBlueprintId = `rec_${Date.now()}`;
+        currentBlueprintName = recName.trim();
+      } else {
+        currentBlueprintId = fileData.content.id;
+        currentBlueprintName = fileData.content.name;
+      }
     } else {
       const nameInput = await customPrompt('Enter Blueprint Name:', 'New Stage Blueprint', 'Create Blueprint');
       if (!nameInput) return; // User cancelled
@@ -322,6 +332,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filePath) {
       const fileData = await fetchFileContent(filePath);
       engine.loadJSON(fileData.content);
+      if (isNewBlocking) {
+        engine.setDirty(true);
+      }
     } else {
       engine.loadJSON({ floors: [{ level: 1, layerData: null }] });
     }

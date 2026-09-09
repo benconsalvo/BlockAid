@@ -343,7 +343,7 @@ body {
   text-align: center;
 }
 
-/* CANVAS SCREEN LAYOUT */
+/* CANVAS SCREEN LAYOUT (Strict Flex Viewport Containment) */
 .canvas-screen-container {
   display: flex;
   flex-direction: column;
@@ -354,11 +354,14 @@ body {
   left: 0;
   background-color: var(--color-bg);
   z-index: 500;
+  overflow: hidden;
 }
 
-/* TOP CONTROL RIBBON (Stacking fix) */
+/* TOP CONTROL RIBBON */
 .top-ribbon {
   height: 60px;
+  min-height: 60px;
+  flex-shrink: 0;
   background-color: var(--color-card);
   border-bottom: 2px solid var(--color-gold);
   display: grid;
@@ -473,8 +476,10 @@ body {
   font-size: 14px;
 }
 
+/* MIDDLE WORKSPACE FLEX CONTAINMENT (Prevents Ribbons Cutoff) */
 .canvas-workspace {
   flex: 1;
+  min-height: 0;
   display: flex;
   position: relative;
   overflow: hidden;
@@ -484,6 +489,10 @@ body {
 /* LEFT FLOOR RIBBON */
 .left-floor-ribbon {
   width: 160px;
+  min-width: 160px;
+  height: 100%;
+  min-height: 0;
+  flex-shrink: 0;
   background-color: var(--color-card);
   border-right: 1px solid #444;
   display: flex;
@@ -583,6 +592,8 @@ body {
 
 .konva-holder {
   flex: 1;
+  min-width: 0;
+  min-height: 0;
   background-color: #ECECEC;
   cursor: crosshair;
   width: 100%;
@@ -617,6 +628,10 @@ body {
 /* RIGHT PERFORMERS & NOTES PANEL */
 .right-performers-panel {
   width: 180px;
+  min-width: 180px;
+  height: 100%;
+  min-height: 0;
+  flex-shrink: 0;
   background-color: var(--color-card);
   border-left: 1px solid #444;
   display: flex;
@@ -684,8 +699,11 @@ body {
   margin-right: 4px;
 }
 
+/* BOTTOM DIRECTION BAR */
 .bottom-direction-bar {
   height: 36px;
+  min-height: 36px;
+  flex-shrink: 0;
   background-color: var(--color-card);
   border-top: 1px solid #444;
   display: flex;

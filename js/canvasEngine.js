@@ -37,10 +37,10 @@ export class BlueprintEngine {
     this.floorOrder = [1];
     this.showGrid = true;
 
-    // --- PHASE 4 RECORDING ENGINE STATE ---
+    // --- RECORDING ENGINE STATE ---
     this.performers = {}; // { id: { id, name, color, group, floor } }
-    this.recordedFrames = []; // Array of { timestamp, floor, performerData: { id: { x, y, floor } } }
-    this.notes = []; // Array of { timestamp, text, floor }
+    this.recordedFrames = [];
+    this.notes = [];
     
     this.isRecording = false;
     this.isPlaying = false;
@@ -120,7 +120,8 @@ export class BlueprintEngine {
       x: startPos.x,
       y: startPos.y,
       draggable: true,
-      id: id
+      id: id,
+      name: 'performer-token'
     });
 
     const circle = new Konva.Circle({
@@ -180,7 +181,7 @@ export class BlueprintEngine {
 
     this.recordingInterval = setInterval(() => {
       this.recordFrame();
-    }, 100); // Record position every 100ms
+    }, 100);
   }
 
   recordFrame() {
@@ -255,7 +256,6 @@ export class BlueprintEngine {
         this.onTimerUpdateCallback(currentRecTime);
       }
 
-      // Check for Stage Notes trigger
       const triggeredNote = this.notes.find(n => Math.abs(n.timestamp - currentRecTime) < 120);
       if (triggeredNote && !triggeredNote.shown) {
         triggeredNote.shown = true;
@@ -265,14 +265,12 @@ export class BlueprintEngine {
         }
       }
 
-      // Find closest recorded frame
       const frame = this.recordedFrames.find(f => f.timestamp >= currentRecTime);
       if (frame) {
         Object.keys(frame.performerData).forEach(id => {
           const data = frame.performerData[id];
           const p = this.performers[id];
           if (p) {
-            // Seamless Floor Level Switch during replay
             if (data.floor !== this.activeFloor) {
               this.switchFloor(data.floor);
             }
@@ -281,7 +279,6 @@ export class BlueprintEngine {
         });
         this.tokenLayer.batchDraw();
       } else {
-        // End of recording reach
         this.stopPlayback();
         return;
       }
@@ -531,6 +528,11 @@ export class BlueprintEngine {
       this.isRightClickPanning = true;
       this.lastPanPointer = { x: e.evt.clientX, y: e.evt.clientY };
       this.container.style.cursor = 'grabbing';
+      return;
+    }
+
+    // FIX ISSUE 2: PREVENT DRAWING ARTIFACT WHEN CLICKING PERFORMER TOKENS
+    if (e.target && (e.target.getLayer() === this.tokenLayer || e.target.name() === 'performer-token')) {
       return;
     }
 
