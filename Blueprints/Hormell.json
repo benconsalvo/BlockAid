@@ -1,0 +1,20 @@
+{
+  "id": "bp_1788925448473",
+  "name": "Hormell",
+  "updatedAt": "2026-09-09T03:44:34.015Z",
+  "floors": [
+    {
+      "level": 1,
+      "name": "Second Floor",
+      "layerData": "{\"attrs\":{},\"className\":\"Layer\",\"children\":[{\"attrs\":{\"x\":388,\"y\":241,\"width\":260,\"height\":234,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Rect\"},{\"attrs\":{\"x\":1282,\"y\":692,\"width\":-228,\"height\":-332,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Rect\"}]}"
+    },
+    {
+      "level": 2,
+      "name": "Stage",
+      "layerData": "{\"attrs\":{},\"className\":\"Layer\",\"children\":[{\"attrs\":{\"x\":388,\"y\":321,\"width\":258,\"height\":223,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Rect\"},{\"attrs\":{\"x\":1505,\"y\":599,\"width\":-311,\"height\":-546,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Rect\"},{\"attrs\":{\"x\":860,\"y\":116,\"radius\":152.7121475194426,\"stroke\":\"#1C1C1C\",\"strokeWidth\":3},\"className\":\"Circle\"}]}"
+    }
+  ],
+  "recordedFrames": [],
+  "notes": [],
+  "performers": []
+}
