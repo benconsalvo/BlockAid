@@ -249,20 +249,36 @@ body {
   z-index: 500;
 }
 
+/* TOP CONTROL RIBBON (3-Column Layout for Perfect Centering) */
 .top-ribbon {
   height: 60px;
   background-color: var(--color-card);
   border-bottom: 2px solid var(--color-gold);
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   padding: 0 16px;
 }
 
-.ribbon-group-left, .ribbon-group-center {
+.ribbon-group-left {
   display: flex;
   align-items: center;
   gap: 10px;
+  justify-self: start;
+}
+
+.ribbon-group-center {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: center;
+}
+
+.ribbon-group-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: end;
 }
 
 .btn-tool {
@@ -280,6 +296,51 @@ body {
   color: var(--color-bg);
   border-color: var(--color-gold);
   font-weight: bold;
+}
+
+/* Color Picker Styling */
+.color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-bg);
+  border: 1px solid #555;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.color-picker-label {
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.color-picker-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+}
+
+.color-picker-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker-input::-webkit-color-swatch {
+  border: 1px solid var(--color-gold);
+  border-radius: 4px;
+}
+
+.color-picker-input::-moz-color-swatch {
+  border: 1px solid var(--color-gold);
+  border-radius: 4px;
 }
 
 .dirty-dot {

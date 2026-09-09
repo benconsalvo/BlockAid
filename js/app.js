@@ -283,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
       row.draggable = true;
       row.dataset.index = index;
 
-      // Drag and Drop Event Handlers
       row.addEventListener('dragstart', (e) => {
         draggedIndex = index;
         row.classList.add('dragging');
@@ -367,6 +366,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-bp-save').addEventListener('click', saveBlueprintData);
     document.getElementById('btn-bp-undo').addEventListener('click', () => engine.undo());
     document.getElementById('btn-bp-redo').addEventListener('click', () => engine.redo());
+
+    // Color Picker Event Listener
+    const colorInput = document.getElementById('tool-color');
+    if (colorInput) {
+      colorInput.addEventListener('input', (e) => {
+        engine.setColor(e.target.value);
+      });
+    }
 
     // Keyboard Shortcuts for Undo (Ctrl+Z / Cmd+Z) and Redo (Ctrl+Y / Cmd+Y / Ctrl+Shift+Z)
     window.addEventListener('keydown', (e) => {

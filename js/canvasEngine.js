@@ -7,10 +7,11 @@ export class BlueprintEngine {
     this.layer = null;
     
     this.activeTool = 'freehand'; // 'freehand', 'line', 'box', 'circle'
+    this.strokeColor = '#1C1C1C';
     this.activeFloor = 1;
     this.floorsData = { 1: null };
     this.floorNames = { 1: 'Level 1' };
-    this.floorOrder = [1]; // Tracks exact display sequence
+    this.floorOrder = [1];
 
     this.undoStack = [];
     this.redoStack = [];
@@ -55,6 +56,10 @@ export class BlueprintEngine {
     this.activeTool = tool;
   }
 
+  setColor(color) {
+    this.strokeColor = color;
+  }
+
   bindEvents() {
     this.stage.on('mousedown touchstart', (e) => this.handlePointerDown(e));
     this.stage.on('mousemove touchmove', (e) => this.handlePointerMove(e));
@@ -67,7 +72,7 @@ export class BlueprintEngine {
 
     if (this.activeTool === 'freehand') {
       this.currentShape = new Konva.Line({
-        stroke: '#1C1C1C',
+        stroke: this.strokeColor,
         strokeWidth: 3,
         points: [pos.x, pos.y, pos.x, pos.y],
         tension: 0.5,
@@ -76,7 +81,7 @@ export class BlueprintEngine {
       });
     } else if (this.activeTool === 'line') {
       this.currentShape = new Konva.Line({
-        stroke: '#1C1C1C',
+        stroke: this.strokeColor,
         strokeWidth: 3,
         points: [pos.x, pos.y, pos.x, pos.y],
         lineCap: 'round'
@@ -87,7 +92,7 @@ export class BlueprintEngine {
         y: pos.y,
         width: 0,
         height: 0,
-        stroke: '#1C1C1C',
+        stroke: this.strokeColor,
         strokeWidth: 3
       });
     } else if (this.activeTool === 'circle') {
@@ -95,7 +100,7 @@ export class BlueprintEngine {
         x: pos.x,
         y: pos.y,
         radius: 0,
-        stroke: '#1C1C1C',
+        stroke: this.strokeColor,
         strokeWidth: 3
       });
     }
